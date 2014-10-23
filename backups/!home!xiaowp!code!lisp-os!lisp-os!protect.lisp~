@@ -1,0 +1,5 @@
+(in-package protect)
+
+(defparameter *GDT* nil)
+
+

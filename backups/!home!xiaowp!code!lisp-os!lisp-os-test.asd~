@@ -1,0 +1,11 @@
+;;;; -*- Mode: Lisp -*-
+
+(defsystem lisp-os-test
+  :name "lisp os test"
+  :author "xiaowp"
+  :licence "BSD"
+  :description "test lisp os"
+  :depends-on (:lisp-os :rt)
+  :components ((:file "package")
+               (:module "test" :depends-on ("package")
+                :components ((:file "lisp-os-test")))))

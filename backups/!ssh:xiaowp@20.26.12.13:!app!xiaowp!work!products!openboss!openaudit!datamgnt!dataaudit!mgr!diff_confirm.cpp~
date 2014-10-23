@@ -1,0 +1,12 @@
+#include <map>
+
+#include "thread_value.h"
+#include "openbroker/svr_ctrl.h"
+#include "ob_session.h"
+#include "ob_kernel.h"
+
+typedef std::map<AISTD string, void*> LibMap;
+
+extern "C"
+int sec_confirm (
+        

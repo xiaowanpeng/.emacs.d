@@ -1,0 +1,45 @@
+(in-package :com.gigamonkeys.binary-data)
+
+(defun read-u2 (in)
+  (let ((u2 0))
+    (setf (ldb (byte 8 8) u2) (read-byte in))
+    (setf (ldb (byte 8 0) u2) (read-byte in))
+    u2))
+
+(defun write-u2 (out value)
+  (write-byte (ldb (byte 8 8) value) out)
+  (write-byte (ldb (byte 8 0) value) out))
+
+(defconstant +null+ (code-char 0))
+
+(defun read-null-terminated-ascii (in)
+  (with-output-to-string (s)
+    (loop for char = (code-char (read-byte in))
+         until  (char= char +null+) do (write-char char s))))
+
+(defun write-null-terminated-ascii (string out)
+  (loop for char across string
+       do (write-byte (char-code char) out))
+  (write-byte (char-code +null+) out))
+
+(defclass id3-tag ()
+  ((identifier :initarg :identifier :accessor identifier)
+   (major-version :initarg :major-version :accessor major-version)
+   (revision :initarg :revision :accessor revision)
+   (flags :initarg :flags :accessor flags)
+   (size :initarg :size :accessor size)
+   (frames :initarg :frames :accessor frames)))
+
+(defun as-keywork (sym) (intern (string sym) :keyword))
+
+(defun slot->defclass-slot (spec)
+  (let ((name (first spec)))
+    `(,name :initarg ,(as-keywork name) :accessor ,name)))
+
+(defmacro define-binary-class (name slots)
+  `(defclass ,name ()
+     ,(mapcar #'slot->defclass-slot slots)))
+
+(defgeneric read-value (type stream &key)
+  (:documentation "Read a value of the given type from the stream."))
+

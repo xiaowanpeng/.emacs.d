@@ -1,0 +1,169 @@
+/**
+ * @file dmcext_audit_mgr.cpp
+ * @brief  mgr layer
+ * @author huangkun, huangkun@asiainfo-linkage.com
+ * @copyright(c) 2003-2012, Asiainfo HangZhou. All rights reserved.
+ * @version 1.0
+ * @date 2011-08-23
+ */
+
+#include "dmcext_audit_mgr.h"
+#include "ob_session.h"
+#include "base_db_func.h"
+
+
+std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmFlowDefineList> > CDmcextAuditMgr::getFmFlowDefine(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmFlowDefineList> > m_pFmFlowDefine ( 
+        new CDmcextTemplateMgr<MFlowManagerDb::CFmFlowDefineList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmFlowDefine;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmFlowNodeInfoList> > CDmcextAuditMgr::getFmFlowNodeInfo(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmFlowNodeInfoList> > m_pFmFlowNodeInfo ( 
+        new CDmcextTemplateMgr<MFlowManagerDb::CFmFlowNodeInfoList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmFlowNodeInfo;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmFlowNodeParamList> > CDmcextAuditMgr::getFmFlowNodeParam(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmFlowNodeParamList> > m_pFmFlowNodeParam ( 
+        new CDmcextTemplateMgr<MFlowManagerDb::CFmFlowNodeParamList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmFlowNodeParam;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmFlowNodeRelationList> > CDmcextAuditMgr::getFmFlowNodeRelation(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmFlowNodeRelationList> > m_pFmFlowNodeRelation ( 
+        new CDmcextTemplateMgr<MFlowManagerDb::CFmFlowNodeRelationList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmFlowNodeRelation;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmNodeDefineList> > CDmcextAuditMgr::getFmNodeDefine(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmNodeDefineList> > m_pFmNodeDefine ( 
+        new CDmcextTemplateMgr<MFlowManagerDb::CFmNodeDefineList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmNodeDefine;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmNodeParamDefineList> > CDmcextAuditMgr::getFmNodeParamDefine(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmNodeParamDefineList> > m_pFmNodeParamDefine ( 
+        new CDmcextTemplateMgr<MFlowManagerDb::CFmNodeParamDefineList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmNodeParamDefine;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmPlanList> > CDmcextAuditMgr::getFmPlan(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmPlanList> > m_pFmPlan ( 
+        new CDmcextTemplateMgr<MFlowManagerDb::CFmPlanList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmPlan;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmPlanParamList> > CDmcextAuditMgr::getFmPlanParam(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmPlanParamList> > m_pFmPlanParam ( 
+        new CDmcextTemplateMgr<MFlowManagerDb::CFmPlanParamList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmPlanParam;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmTaskLogList> > CDmcextAuditMgr::getFmTaskLog(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmTaskLogList> > m_pFmTaskLog ( 
+        new CDmcextTemplateMgr<MFlowManagerDb::CFmTaskLogList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmTaskLog;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmTaskNodeInfoList> > CDmcextAuditMgr::getFmTaskNodeInfo(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmTaskNodeInfoList> > m_pFmTaskNodeInfo ( 
+        new CDmcextTemplateMgr<MFlowManagerDb::CFmTaskNodeInfoList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmTaskNodeInfo;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CAuditSysParamList> > CDmcextAuditMgr::getAuditSysParam(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CAuditSysParamList> > m_pAuditSysParam ( 
+        new CDmcextTemplateMgr<MFlowManagerDb::CAuditSysParamList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pAuditSysParam;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmScriptDefineList> > CDmcextAuditMgr::getFmScriptDefine(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CFmScriptDefineList> > m_pFmScriptDefine ( 
+        new CDmcextTemplateMgr<MFlowManagerDb::CFmScriptDefineList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmScriptDefine;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CAuditStatusPollingList> > CDmcextAuditMgr::getAuditStatusPolling(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MFlowManagerDb::CAuditStatusPollingList> > m_pAuditStatusPolling ( 
+        new CDmcextTemplateMgr<MFlowManagerDb::CAuditStatusPollingList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pAuditStatusPolling;
+}
+
+
+//--------------------------------------------------------------------------------------------------
+
+std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditRepairRuleList> > CDmcextAuditMgr::getAuditRepairRule(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditRepairRuleList> > m_pAuditRepairRule (
+        new CDmcextTemplateMgr<MDataAuditDb::CAuditRepairRuleList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pAuditRepairRule;
+}
+std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditSaveDefineList> > CDmcextAuditMgr::getAuditSaveDefine(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditSaveDefineList> > m_pAuditSaveDefine (
+        new CDmcextTemplateMgr<MDataAuditDb::CAuditSaveDefineList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pAuditSaveDefine;
+}
+std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditSystemDefineList> > CDmcextAuditMgr::getAuditSystemDefine(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditSystemDefineList> > m_pAuditSystemDefine (
+        new CDmcextTemplateMgr<MDataAuditDb::CAuditSystemDefineList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pAuditSystemDefine;
+}
+std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditSystemIntfDefineList> > CDmcextAuditMgr::getAuditSystemIntfDefine(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditSystemIntfDefineList> > m_pAuditSystemIntfDefine (
+        new CDmcextTemplateMgr<MDataAuditDb::CAuditSystemIntfDefineList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pAuditSystemIntfDefine;
+}
+std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditRepairOrderList> > CDmcextAuditMgr::getAuditRepairOrder(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditRepairOrderList> > m_pAuditRepairOrder (
+        new CDmcextTemplateMgr<MDataAuditDb::CAuditRepairOrderList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pAuditRepairOrder;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditBusiDefineList> > CDmcextAuditMgr::getAuditBusiDefine(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditBusiDefineList> > m_pAuditBusiDefine (
+        new CDmcextTemplateMgr<MDataAuditDb::CAuditBusiDefineList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pAuditBusiDefine;
+}
+std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditCmpRepairRelList> > CDmcextAuditMgr::getAuditCmpRepairRel(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditCmpRepairRelList> > m_pAuditCmpRepairRel (
+        new CDmcextTemplateMgr<MDataAuditDb::CAuditCmpRepairRelList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pAuditCmpRepairRel;
+}   
+std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditScriptDefineList> > CDmcextAuditMgr::getAuditScriptDefine(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditScriptDefineList> > m_pAuditScriptDefine (
+        new CDmcextTemplateMgr<MDataAuditDb::CAuditScriptDefineList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pAuditScriptDefine;
+}
+std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditScriptRuleList> > CDmcextAuditMgr::getAuditScriptRule(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditScriptRuleList> > m_pAuditScriptRule (
+        new CDmcextTemplateMgr<MDataAuditDb::CAuditScriptRuleList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pAuditScriptRule;
+}
+std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditFetchRuleList> > CDmcextAuditMgr::getAuditFetchRule(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<MDataAuditDb::CAuditFetchRuleList> > m_pAuditFetchRule (
+        new CDmcextTemplateMgr<MDataAuditDb::CAuditFetchRuleList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pAuditFetchRule;
+}  	   

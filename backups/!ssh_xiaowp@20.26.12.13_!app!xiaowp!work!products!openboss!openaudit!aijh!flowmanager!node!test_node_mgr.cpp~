@@ -1,0 +1,52 @@
+#include "test_node.h"
+#include <iostream>
+
+#include "dmcext_audit_mgr.h"
+#include "base_func.h"
+#include "thread_value.h"
+#include "openbroker/OBClient.h"
+#include "openbroker/svr_ctrl.h"
+
+#include "tool.h"
+
+using namespace MFlowManagerDb;
+
+int TestNode::run (
+    SOBSession* pSession,
+    int64 llTaskId,
+    int32 nInstId,
+    const AISTD string& strXmlParam,
+    CBSErrorMsg& cErrorMsg )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter TestNode::run ok.");
+    if (CNodeAbstractBase::run
+        (pSession,
+         llTaskId,
+         nInstId,
+         strXmlParam,
+         cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call CNodeAbstractBase::run error.");
+        return -1;
+    }
+
+    CStringMap tmpMap;
+
+    if (CNodeAbstractBase::xml2Map (
+            strXmlParam,
+            nInstId,
+            tmpMap,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call CNodeAbstractBase::xml2Map error.");
+        return -1;
+    }
+
+    if (tmpMap.find("sleep_time") != tmpMap.end())
+    {
+        sleep(atoi(tmpMap["sleep_time"].c_str()));
+    }
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave TestNode::run ok.");
+    return 0;
+}

@@ -1,0 +1,97 @@
+#include "gen_rc_node_mgr.h"
+#include <iostream>
+
+#include "flow_template_mgr.h"
+#include "base_func.h"
+#include "thread_value.h"
+#include "openbroker/OBClient.h"
+#include "openbroker/svr_ctrl.h"
+
+#include "tool.h"
+
+using namespace MFlowManagerDb;
+
+int GenRcNode::run (
+    SOBSession* pSession,
+    const int64& llTaskId,
+    const int32& nInstId,
+    const AISTD string& strXmlParam,
+    CBSErrorMsg& cErrorMsg )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter GenRcNode::run ok.");
+
+    CStringMap paramMap;
+
+    if (CNodeAbstractBase::xml2Map (
+            strXmlParam,
+            nInstId,
+            paramMap,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call CNodeAbstractBase::xml2Map error.");
+        return -1;
+    }
+
+    if (paramMap.find("subtask_id") == paramMap.end())
+    {
+        cErrorMsg.set_errorMsg("子任务编号参数不存在。");
+    }
+
+    if (paramMap.find("task_id") == paramMap.end())
+    {
+        cErrorMsg.set_errorMsg("总任务编号参数不存在。");
+    }
+
+    int nExecNum = 0;
+    ob_whereCond cFullSql;
+    cFullSql << OCS(" update audit_task_detail set RC_STATUS = 9 where subtask_id = ")
+             << OCS(paramMap["subtask_id"].c_str())
+             << OCS(" and sub_flag = 1 and rc_status = 0 ");
+
+    if (CNodeAbstractBase::directExec (
+            pSession,
+            cFullSql,
+            nExecNum,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call CNodeAbstractBase::directExec error.");
+        return -1;
+    }
+
+    if (1 != nExecNum)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","update audit_task_detail sts to trigger, execNum is not 1");
+        return -1;
+    }
+
+    cFullSql.clear();
+
+    cFullSql << OCS("update audit_compare_result_all_")
+             << OCS(paramMap["task_id"].c_str())
+             << OCS(" set deal_sts = 30 where sub_task_id = ")
+             << OCS(paramMap["subtask_id"].c_str())
+             << OCS(" and deal_sts = 32"); // 这个32是修复成功
+
+    if (CNodeAbstractBase::directExec (
+            pSession,
+            cFullSql,
+            nExecNum,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call CNodeAbstractBase::directExec error.");
+        return -1;
+    }
+
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave GenRcNode::run ok.");
+    return 1;
+}
+
+extern "C"  CNodeAbstractBase *New() 
+{
+    return new GenRcNode;
+}
+
+extern "C" void Delete( CNodeAbstractBase * p) 
+{
+    delete p;
+}

@@ -1,0 +1,367 @@
+/*** === ASIAINFO ===========================================================
+CAPTION
+           Project Name: OPENBOSS
+	   			 Description : 全量稽核功能
+           File Name   : DataAudit_db.obd
+           Requires    : 
+           Author      : 
+           Create Date : 
+---------------------------------------------------------------------------
+       Copyright ( C )  by ASIAINFO Tech. Corporation.
+                 All rights reserved.
+---------------------------------------------------------------------------
+CHANGE HISTORY
+Version	    Date(YYYY-MM-DD)	 Modified  By
+Ver0.1        2009-06-12       modify xujg
+=========================================================== ASIAINFO === ***/
+
+#pragma version "$Id: DataAudit_db.obd 895544 2013-01-28 08:37:17Z liunn3 $"
+ 
+#pragma db
+
+module MDataAuditDb
+{    
+    struct CPageInfo
+    {
+			int16   qry_type;
+			int32   page_id; 
+			int32   page_size; 
+			int64   total_count;
+			int16   sort_flag; 
+			string  sort_alias; 
+			string  notes;
+    };
+		//稽核任务定义表,稽核任务定义历史表
+		struct CAuditDataDefineAll import table AUDIT_DATA_DEFINE_ALL
+		{
+		};
+		list vector<CAuditDataDefineAll> CAuditDataDefineAllList; 
+		
+		//稽核任务表
+		struct CAuditTaskAll import table AUDIT_TASK_ALL
+		{
+		};
+		list vector<CAuditTaskAll> CAuditTaskAllList; 
+		
+		//稽核结果表
+		struct CAuditTaskResultAll import table AUDIT_TASK_RESULT_ALL
+		{
+		};
+		list vector<CAuditTaskResultAll> CAuditTaskResultAllList;       
+		
+		//sql主从表稽核,主从表稽核历史表
+		struct CAuditSqlcaDefine import table AUDIT_SQLCA_DEFINE
+		{
+		};
+		list vector<CAuditSqlcaDefine> CAuditSqlcaDefineList;
+				
+		struct CAuditSqlcaTaskInfo import table AUDIT_SQLCA_TASK_INFO
+		{
+		};
+		list vector<CAuditSqlcaTaskInfo> CAuditSqlcaTaskInfoList;
+		 
+		struct CAuditSqlcaTaskResult import table AUDIT_SQLCA_TASK_RESULT
+		{
+		};
+		list vector<CAuditSqlcaTaskResult> CAuditSqlcaTaskResultList; 
+		
+		struct CAuditSystemDefine  import table AUDIT_SYSTEM_DEFINE
+		{
+		};
+		list vector<CAuditSystemDefine> CAuditSystemDefineList;
+
+		struct CAuditRepairRule import table AUDIT_REPAIR_RULE
+		{
+		};
+		list vector<CAuditRepairRule>  CAuditRepairRuleList;
+
+		struct CAuditRepairRecord import table AUDIT_REPAIR_RECORD
+		{
+		};
+		list vector<CAuditRepairRecord> CAuditRepairRecordList;
+
+		struct CAuditCycleTaskInfo import table AUDIT_CYCLE_TASK_INFO
+		{
+		};
+		list vector<CAuditCycleTaskInfo> CAuditCycleTaskInfoList;
+		
+		struct CAuditFileDefine import table AUDIT_FILE_DEFINE
+		{
+		};
+		list vector<CAuditFileDefine> CAuditFileDefineList;
+		
+		struct CAuditFileDefineDtl import table AUDIT_FILE_DEFINE_DTL
+		{
+		};
+		list vector<CAuditFileDefineDtl> CAuditFileDefineDtlList;
+
+		struct CAuditMachineInfo import table AUDIT_MACHINE_INFO
+		{
+		};
+		list vector<CAuditMachineInfo> CAuditMachineInfoList;
+
+		struct CAuditTaskFileLog import table AUDIT_TASK_FILE_LOG
+		{
+		};
+		list vector<CAuditTaskFileLog> CAuditTaskFileLogList;
+		
+		struct CAuditTableDetailInfo import table AUDIT_TABLE_DETAIL_INFO
+		{
+		};
+		list vector<CAuditTableDetailInfo> CAuditTableDetailInfoList;
+		
+		struct CAuditRepairInfo import table AUDIT_REPAIR_INFO
+		{
+		};
+		list vector<CAuditRepairInfo> CAuditRepairInfoList;
+		
+		struct CAuditIncrementRule import table AUDIT_INCREMENT_RULE
+		{
+		};
+		list vector<CAuditIncrementRule> CAuditIncrementRuleList;
+		
+		struct CAuditPhoneInfo import table AUDIT_PHONE_INFO
+		{
+		};
+		list vector<CAuditPhoneInfo> CAuditPhoneInfoList;
+		
+		struct CAuditFileReplyDefine import table AUDIT_FILE_REPLY_DEFINE
+    {       
+    };      
+    list vector<CAuditFileReplyDefine> CAuditFileReplyDefineList;
+        
+    struct CAuditBaseType import table AUDIT_BASE_TYPE
+    {
+    };
+    list vector<CAuditBaseType> CAuditBaseTypeList;
+    
+    struct CAuditFtpdirDefine import table AUDIT_FTPDIR_DEFINE
+    {
+    };
+    list vector<CAuditFtpdirDefine> CAuditFtpdirDefineList;
+    
+    struct CAuditGroupInfo import table AUDIT_GROUP_INFO
+    {
+    };
+    list vector<CAuditGroupInfo> CAuditGroupInfoList;
+    
+    struct CAuditRuleRelation import table AUDIT_RULE_RELATION
+    {
+    };
+    list vector<CAuditRuleRelation> CAuditRuleRelationList;
+    
+    struct CAuditMachineDirRelation import table AUDIT_MACHINE_DIR_RELATION
+    {
+    };
+    list vector<CAuditMachineDirRelation> CAuditMachineDirRelationList;
+    
+    struct CAuditDiffDetail import table AUDIT_DIFF_DETAIL
+    {
+    };
+    list vector<CAuditDiffDetail> CAuditDiffDetailList;
+    
+    struct CAuditDataTypeDefine import table AUDIT_DATA_TYPE_DEFINE
+    {
+    };
+    list vector<CAuditDataTypeDefine> CAuditDataTypeDefineList;
+    
+    struct CAuditTeamInfo import table AUDIT_TEAM_INFO
+    {
+    };
+    list vector<CAuditTeamInfo> CAuditTeamInfoList;
+    
+    struct CAuditBusiRecord import table AUDIT_BUSI_RECORD
+    {
+    };
+    list vector<CAuditBusiRecord> CAuditBusiRecordList;
+    
+    struct CAuditWarnRecord import table AUDIT_WARN_RECORD
+    {
+    };
+    list vector<CAuditWarnRecord> CAuditWarnRecordList;
+    
+    struct CAuditWarnDefine import table AUDIT_WARN_DEFINE
+    {
+    };
+    list vector<CAuditWarnDefine> CAuditWarnDefineList;
+    
+    struct CAuditGetdataRule import table AUDIT_GETDATA_RULE
+    {
+    };
+    list vector<CAuditGetdataRule> CAuditGetdataRuleList;
+    
+    struct CAuditBusiDefine import table AUDIT_BUSI_DEFINE
+    {
+    };
+    list vector<CAuditBusiDefine> CAuditBusiDefineList;
+    
+    struct CAuditDiffResolveRule import table AUDIT_DIFF_RESOLVE_RULE
+    {
+    };
+    list vector<CAuditDiffResolveRule> CAuditDiffResolveRuleList;
+    
+    struct CAuditDiffResolveRecord import table AUDIT_DIFF_RESOLVE_RECORD
+    {
+    };
+    list vector<CAuditDiffResolveRecord> CAuditDiffResolveRecordList;
+    
+    struct CAuditFileColumnRelation import table AUDIT_FILE_COLUMN_RELATION
+    {
+    };
+    list vector<CAuditFileColumnRelation> CAuditFileColumnRelationList;
+    
+    struct CAuditSourceFileRelation import table AUDIT_SOURCE_FILE_RELATION
+    {
+    };
+    list vector<CAuditSourceFileRelation> CAuditSourceFileRelationList;
+    
+    struct CAuditBusiSourceRelation import table AUDIT_BUSI_SOURCE_RELATION
+    {
+    };
+    list vector<CAuditBusiSourceRelation> CAuditBusiSourceRelationList;
+    
+    struct CAuditRuleGroupRelation import table AUDIT_RULE_GROUP_RELATION
+    {
+    };
+    list vector<CAuditRuleGroupRelation> CAuditRuleGroupRelationList;
+    
+    struct CAuditBusiGroupRelation import table AUDIT_BUSI_GROUP_RELATION
+    {
+    };
+    list vector<CAuditBusiGroupRelation> CAuditBusiGroupRelationList;
+    
+    struct CAuditWorkOrder import table AUDIT_WORK_ORDER
+    {
+    };
+    list vector<CAuditWorkOrder> CAuditWorkOrderList;
+    
+    struct CAuditWorkOrderRecord import table AUDIT_WORK_ORDER_RECORD
+    {
+    };
+    list vector<CAuditWorkOrderRecord> CAuditWorkOrderRecordList;
+    
+    struct CAuditMyFollowDefine import table AUDIT_MY_FOLLOW_DEFINE
+    {
+    };
+    list vector<CAuditMyFollowDefine> CAuditMyFollowDefineList;
+    
+    struct CAuditAlarmTheme import table AUDIT_ALARM_THEME
+    {
+    };
+    list vector<CAuditAlarmTheme> CAuditAlarmThemeList;
+    
+    struct CAuditAlarmUser import table AUDIT_ALARM_USER
+    {
+    };
+    list vector<CAuditAlarmUser> CAuditAlarmUserList;
+    
+    struct CAuditAlarmTeam import table AUDIT_ALARM_TEAM
+    {
+    };
+    list vector<CAuditAlarmTeam> CAuditAlarmTeamList;
+    
+    struct CAuditAlarmTeamDetail import table AUDIT_ALARM_TEAM_DETAIL
+    {
+    };
+    list vector<CAuditAlarmTeamDetail> CAuditAlarmTeamDetailList;
+    
+    struct CAuditAlarmDefine import table AUDIT_ALARM_DEFINE
+    {
+    };
+    list vector<CAuditAlarmDefine> CAuditAlarmDefineList;
+    
+    struct CAuditAlarmMsgTemplate import table AUDIT_ALARM_MSG_TEMPLATE
+    {
+    };
+    list vector<CAuditAlarmMsgTemplate> CAuditAlarmMsgTemplateList;
+    
+    struct CAuditAlarmRecord import table AUDIT_ALARM_RECORD
+    {
+    };
+    list vector<CAuditAlarmRecord> CAuditAlarmRecordList;
+    
+    struct CAuditAlarmRecordHis import table AUDIT_ALARM_RECORD_HIS
+    {
+    };
+    list vector<CAuditAlarmRecordHis> CAuditAlarmRecordHisList;
+    
+    struct CAuditAlarmTimeoutRecord import table AUDIT_ALARM_TIMEOUT_RECORD
+    {
+    };
+    list vector<CAuditAlarmTimeoutRecord> CAuditAlarmTimeoutRecordList;
+    
+    struct CAuditNotice import table AUDIT_NOTICE
+    {
+    };
+    list vector<CAuditNotice> CAuditNoticeList;
+    
+    struct CAuditOpSetting import table AUDIT_OP_SETTING
+    {
+    };
+    list vector<CAuditOpSetting> CAuditOpSettingList;
+    
+    struct CAuditBusiRelation import table AUDIT_BUSI_RELATION
+    {
+    };
+    list vector<CAuditBusiRelation> CAuditBusiRelationList;
+    
+    struct CAuditDbGroup import table AUDIT_DB_GROUP
+    {
+    };
+    list vector<CAuditDbGroup> CAuditDbGroupList;
+    
+    struct CAuditPhoneDesc import table AUDIT_PHONE_DESC
+    {
+    };
+    list vector<CAuditPhoneDesc> CAuditPhoneDescList;
+    
+    struct CAuditCallRule import table AUDIT_CALL_RULE
+    {
+    };
+    list vector<CAuditCallRule> CAuditCallRuleList;
+    
+    struct CAuditLoginLog import table AUDIT_LOGIN_LOG
+    {
+    };//liunn3
+    list vector<CAuditLoginLog> CAuditLoginLogList;//liunn3
+
+    struct CAuditOperLog import table AUDIT_OPER_LOG
+    {
+    };//liunn3
+    list vector<CAuditOperLog> CAuditOperLogList;//liunn3    
+    
+    struct CAuditTabCntMtr import table AUDIT_TAB_CNT_MTR
+    {
+    };
+    list vector<CAuditTabCntMtr> CAuditTabCntMtrList; 
+    struct CAuditDataSyncDefine import table AUDIT_DATA_SYNC_DEFINE
+    {
+    };
+    list vector<CAuditDataSyncDefine> CAuditDataSyncDefineList; 
+    
+    struct CAuditLibDefine import table AUDIT_LIB_DEFINE
+    {
+    };
+    list vector<CAuditLibDefine> CAuditLibDefineList;
+    
+    struct CAuditRepairIndex import table AUDIT_REPAIR_INDEX
+    {
+    };
+    list vector<CAuditRepairIndex> CAuditRepairIndexList;
+    
+    struct CAuditPlatCleanRule import table AUDIT_PLAT_CLEAN_RULE
+    {
+    };
+    list vector<CAuditPlatCleanRule> CAuditPlatCleanRuleList;
+
+    struct CAuditProvision import table AUDIT_PROVISION
+    {
+    };
+    list vector<CAuditProvision> CAuditProvisionList;
+
+    struct CAuditRulePlanMapping import table AUDIT_RULE_PLAN_MAPPING
+    {
+    };
+    list vector<CAuditRulePlanMapping> CAuditRulePlanMappingList;
+}
+

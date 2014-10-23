@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: selectFromTable
+# key: sl
+# --
+if(t$1->selectFromTable(
+        ${2:c$1},
+        "$3",
+        ${4:list$1},
+        cErrorMsg))
+{
+    DMCEXT_ERROR_LOG("t$1->selectFromTable");
+}

@@ -1,0 +1,38 @@
+(defun my-split (str ch)
+  (let ((beg 0)
+        (end 0)
+        (result nil)
+        (str (string-downcase str)))
+    (dotimes (i 10)
+      (setf end (position ch str :start beg))
+      (cond (end (setf result (append result (list (subseq str beg end))))
+                 (setf beg (1+ end)))
+            (t (setf result (append result (list (subseq str beg))))
+               (return result))))))
+
+(defparameter db-templete "
+    struct Cxxxx import table XXXX
+    {
+    };
+    list vector<Cxxxx> CxxxxList;
+")
+
+                     
+(defun gen-db (table-name)
+  (let ((word-list (my-split table-name #\_))
+        (up-name (string-upcase table-name))
+        (str-name ""))
+    (dolist (word word-list)
+      (setf str-name (concatenate 'string str-name (string-upcase word :end 1))))
+    (cl-ppcre::regex-replace-all "xxxx"
+                                 (cl-ppcre::regex-replace-all "XXXX" db-templete up-name)
+                                 str-name)))
+
+(defun start_gen_db (file)
+  (with-open-file (in file)
+    (with-open-file (out "db_obd.txt" :direction :output :if-exists :overwrite)
+      (dotimes (i 100)
+           (let ((vl (read-line in nil nil)))
+             (if (not vl)
+                 (return)
+                 (write-line (gen-db vl) out)))))))

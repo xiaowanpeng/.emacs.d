@@ -1,0 +1,31 @@
+#ifndef _INC_FLOW_TASK_MONITOR_H_
+#define _INC_FLOW_TASK_MONITOR_H_
+
+#include <pthread.h>
+#include "dmcext_audit_mgr.h"
+
+class SOBSession;
+
+class CFlowTaskMonitor
+{
+public:
+    CFlowTaskMonitor();
+    ~CFlowTaskMonitor();
+
+    int run(SOBSession* pSession, CBSErrorMsg& cErrorMsg);
+
+
+private:
+    int incThreadCount();
+    int decThreadCount();
+    
+    int runTasks
+      (SOBSession* pSession,
+       const CFmTaskList& listFmTask,
+       CBSErrorMsg& cErrorMsg);
+                
+private:
+    static int m_nThreadCount;
+};
+
+#endif

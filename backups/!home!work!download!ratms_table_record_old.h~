@@ -1,0 +1,869 @@
+#ifndef _RATMS_TABLE_RECORD_H_
+#define _RATMS_TABLE_RECORD_H_
+
+//#include 	"string.h"
+#include	"socknotify.h"
+#include	"mdb_stdtp.h"
+
+ class CAMTFreeResource;  
+class CAMTShareFreeRes;
+class CAMTRatingAddedUp;
+class CAMTMdbParam;
+class CAMTNotificationInfo1;
+class CAMTNotificationInfo2;
+class CAMTDialogInfo;
+class CAMTBonusInfo;
+class CAMTRentFeeDetail;
+class CAMTRentFeeBookInfo;
+class CAMTShareFreeResLog;
+class CAMTAlertTimesInfo;
+class CAMTBudgetInfo;
+//-------------------------------------------------------------------------------------
+//
+//  Name: 用户免费资源使用表
+//  Desc: 
+//
+//-------------------------------------------------------------------------------------
+class CFreeResource
+{        
+public:
+	mint8	m_llServID;		//服务编号
+	mint8	m_llDoneCode;		//流水号
+	mint4	m_nRegionCode;		//地区编号
+	mint4	m_nRecordType;		//一次性99 周期性1
+					//通过同步程序与初始化程序加载的均为一次性免费资源
+	mint4   m_nProdID;		//产品编号
+	mint4	m_nItemID;		//科目代码
+	mint8	m_llFreeResLimit;	//免费资源累计
+	mint8	m_llFreeResUsed;	//计费累计字段
+	mint8	m_llRiskFreeResUsed;	//欠控累计字段
+	mint8	m_llUsedTime;   	//免费资源使用时间
+	mint8	m_llFreezeFreeRes;
+  	mint8	m_llFreezeRiskFreeRes;
+  	mint8	m_llSessionUsed;
+	mint8	m_llCycleDate;
+	mint8	m_llValidDate;		//生效时间(时间型YYYYMMDDHHMISS)
+	mint8	m_llExpireDate;		//失效时间(时间型YYYYMMDDHHMISS)
+	mint4	m_dtFreezeTime;
+	mint4	m_dtFreezeRiskTime;
+	mint4	m_dtModiTime;		//修改时间time_t
+		
+	BEGIN_SOCK_PKG_DESC
+		PKG_SOCK_FIELD(m_llServID)
+		PKG_SOCK_FIELD(m_llDoneCode)
+		PKG_SOCK_FIELD(m_nRegionCode)
+		PKG_SOCK_FIELD(m_nRecordType)
+		PKG_SOCK_FIELD(m_nProdID)
+		PKG_SOCK_FIELD(m_nItemID)
+		PKG_SOCK_FIELD(m_llFreeResLimit)
+		PKG_SOCK_FIELD(m_llFreeResUsed)
+		PKG_SOCK_FIELD(m_llRiskFreeResUsed)
+		PKG_SOCK_FIELD(m_llUsedTime)
+		PKG_SOCK_FIELD(m_llFreezeFreeRes)
+		PKG_SOCK_FIELD(m_llFreezeRiskFreeRes)
+		PKG_SOCK_FIELD(m_llSessionUsed)
+		PKG_SOCK_FIELD(m_llCycleDate)
+		PKG_SOCK_FIELD(m_llValidDate)
+		PKG_SOCK_FIELD(m_llExpireDate)
+		PKG_SOCK_FIELD(m_dtFreezeTime)
+		PKG_SOCK_FIELD(m_dtFreezeRiskTime)
+		PKG_SOCK_FIELD(m_dtModiTime)
+	END_SOCK_PKG_DESC
+	        
+public:         
+	CFreeResource()  { memset(this,0x00, sizeof(*this));	}  
+	void set_data(CAMTFreeResource &cFreeResource);  
+};              
+
+class CFreeResourceList
+{
+public:
+	mint8	m_nNumber;	//有效的记录数
+	
+BEGIN_SOCK_PKG_DESC
+	PKG_SOCK_FIELD(m_nNumber)
+	PKG_SOCK_FIELD_LIST(m_nNumber, CFreeResource)
+END_SOCK_PKG_DESC
+
+	CFreeResourceList()
+	{
+		memset( (void*)this, 0, sizeof( *this ) ); 
+	}
+
+	inline CFreeResource *get_item(mint4 nIndex) const
+	{
+		if(nIndex < 0 || nIndex >= m_nNumber)
+			return NULL;
+
+		return (CFreeResource *)(((char *)this) 
+				+ AISIZEOF(CFreeResourceList) 
+				+ nIndex * AISIZEOF(CFreeResource));
+	}
+};
+
+//-------------------------------------------------------------------------------------
+//
+//  Name: 群共享免费资源封顶表
+//  Desc: 
+//
+//-------------------------------------------------------------------------------------
+class CShareFreeRes
+{        
+public:
+	mint8	m_llServID;		//服务编号
+	mint8	m_llGroupID;		//集团ID
+	mint8	m_llDoneCode;		//流水号
+	mint4	m_nRegionCode;		//集团所在地区编号
+	mint4	m_nProdID;		//产品编号
+	mint4	m_nItemID;		//科目代码
+	mint4	m_nExprID;		//消耗条件
+	mint8	m_llValidDate;		//生效时间(时间型YYYYMMDDHHMISS)
+	mint8	m_llExpireDate;		//失效时间(时间型YYYYMMDDHHMISS)
+	mint8	m_llFreeResUsed;	//计费累计字段
+	mint8	m_llRiskFreeResUsed;	//欠控累计字段
+	mint4	m_dtModiTime;		//修改时间time_t
+	
+	BEGIN_SOCK_PKG_DESC
+		PKG_SOCK_FIELD(m_llServID)
+		PKG_SOCK_FIELD(m_llGroupID)
+		PKG_SOCK_FIELD(m_llDoneCode)
+		PKG_SOCK_FIELD(m_nRegionCode)
+		PKG_SOCK_FIELD(m_nProdID)
+		PKG_SOCK_FIELD(m_nItemID)
+		PKG_SOCK_FIELD(m_nExprID)
+		PKG_SOCK_FIELD(m_llValidDate)
+		PKG_SOCK_FIELD(m_llExpireDate)
+		PKG_SOCK_FIELD(m_llFreeResUsed)
+		PKG_SOCK_FIELD(m_llRiskFreeResUsed)
+		PKG_SOCK_FIELD(m_dtModiTime)
+	END_SOCK_PKG_DESC
+	
+public:
+	CShareFreeRes()  { memset(this,0x00, sizeof(*this)); } 
+	void set_data(CAMTShareFreeRes &cShareFreeRes);    
+};   
+
+class CShareFreeResList
+{
+public:
+	mint8	m_nNumber;	//有效的记录数
+	
+BEGIN_SOCK_PKG_DESC
+	PKG_SOCK_FIELD(m_nNumber)
+	PKG_SOCK_FIELD_LIST(m_nNumber, CShareFreeRes)
+END_SOCK_PKG_DESC
+
+	CShareFreeResList()
+	{
+		memset( (void*)this, 0, sizeof( *this ) ); 
+	}
+
+	inline CShareFreeRes *get_item(mint4 nIndex) const
+	{
+		if(nIndex < 0 || nIndex >= m_nNumber)
+			return NULL;
+
+		return (CShareFreeRes *)(((char *)this) 
+				+ AISIZEOF(CShareFreeResList) 
+				+ nIndex * AISIZEOF(CShareFreeRes));
+	}
+};
+
+//-------------------------------------------------------------------------------------
+//  
+//  Name: 用户计费累计表
+//  Desc: This table keeps addup information for rating module   
+//
+//-------------------------------------------------------------------------------------
+class CRatingAddedUp
+{
+public: 
+	mint8	m_llServID;		//服务编号
+	mint4	m_nRegionCode;		//地区编号
+	mint4	m_nRatingItemID;	//科目代码
+	mint8	m_llAddedUpLimit;	//累计限额
+	mint8	m_llValidDate;		//生效时间(时间型YYYYMMDDHHMISS)
+	mint8	m_llExpireDate;		//失效时间(时间型YYYYMMDDHHMISS)
+	mint8	m_llAddedUpValue;	//计费累计字段
+	mint8	m_llRiskAddedUpValue;	//欠控累计字段
+	mint8	m_llSessionAddedUp; //会话累计值
+	mint8	m_llCycleDate;
+	mint4	m_dtFreezeRiskAddedUpTime;
+	mint4	m_dtModiTime;		//修改时间time_t
+	
+	BEGIN_SOCK_PKG_DESC
+		PKG_SOCK_FIELD(m_llServID)
+		PKG_SOCK_FIELD(m_nRegionCode)
+		PKG_SOCK_FIELD(m_nRatingItemID)
+		PKG_SOCK_FIELD(m_llAddedUpLimit)
+		PKG_SOCK_FIELD(m_llValidDate)
+		PKG_SOCK_FIELD(m_llExpireDate)
+		PKG_SOCK_FIELD(m_llAddedUpValue)
+		PKG_SOCK_FIELD(m_llRiskAddedUpValue)
+		PKG_SOCK_FIELD(m_llSessionAddedUp)
+		PKG_SOCK_FIELD(m_llCycleDate)  
+		PKG_SOCK_FIELD(m_dtFreezeRiskAddedUpTime)
+		PKG_SOCK_FIELD(m_dtModiTime)
+	END_SOCK_PKG_DESC
+public:
+        CRatingAddedUp()  { memset(this,0x00, sizeof(*this)); }  
+        void set_data(CAMTRatingAddedUp &cRatingAddedUp);   
+}; 
+
+class CRatingAddedUpList
+{
+public:
+	mint8	m_nNumber;	//有效的记录数
+	
+BEGIN_SOCK_PKG_DESC
+	PKG_SOCK_FIELD(m_nNumber)
+	PKG_SOCK_FIELD_LIST(m_nNumber, CRatingAddedUp)
+END_SOCK_PKG_DESC
+
+	CRatingAddedUpList()
+	{
+		memset( (void*)this, 0, sizeof( *this ) ); 
+	}
+
+	inline CRatingAddedUp *get_item(mint4 nIndex) const
+	{
+		if(nIndex < 0 || nIndex >= m_nNumber)
+			return NULL;
+
+		return (CRatingAddedUp *)(((char *)this) 
+				+ AISIZEOF(CRatingAddedUpList) 
+				+ nIndex * AISIZEOF(CRatingAddedUp));
+	}
+};
+//-------------------------------------------------------------------------------------
+//
+//  Name: MDB参数表
+//  Desc: This table keeps  
+//                              
+//-------------------------------------------------------------------------------------
+class CMdbParam 
+{
+public:
+	mint1 	m_szParamName[8];
+	mint4	m_nParamValue;
+	
+	BEGIN_SOCK_PKG_DESC
+		//PKG_SOCK_FIELD(m_szParamName),
+		PKG_SOCK_FIELD(m_nParamValue)
+	END_SOCK_PKG_DESC
+public:
+        CMdbParam() { memset(this,0x00, sizeof(*this)); } 
+        void set_data(CAMTMdbParam &cMdbParam);   
+};
+
+class CMdbParamList
+{
+public:
+	mint8	m_nNumber;	//有效的记录数
+	
+BEGIN_SOCK_PKG_DESC
+	PKG_SOCK_FIELD(m_nNumber)
+	PKG_SOCK_FIELD_LIST(m_nNumber, CMdbParam)
+END_SOCK_PKG_DESC
+
+	CMdbParamList()
+	{
+		memset( (void*)this, 0, sizeof( *this ) ); 
+	}
+
+	inline CMdbParam *get_item(mint4 nIndex) const
+	{
+		if(nIndex < 0 || nIndex >= m_nNumber)
+			return NULL;
+
+		return (CMdbParam *)(((char *)this) 
+				+ AISIZEOF(CMdbParamList) 
+				+ nIndex * AISIZEOF(CMdbParam));
+	}
+};
+
+//-------------------------------------------------------------------------------------
+//
+//  Name: 提醒消息导出表1
+//  Desc: This table keeps  
+//                              
+//-------------------------------------------------------------------------------------
+class CNotifyInfo
+{
+public:
+	mint8	m_llServID;		//服务编号
+	mint1	m_szPhoneNumber[56];	//用户号码
+	mint4	m_nRegionCode;		//地区代码
+	mint4	m_nServiceID;	//业务标示
+	mint8	m_llThreshold;	//提醒阈值
+	mint8	m_llLimit;		//告警时的总量
+	mint8	m_llUsed;		//告警时的使用量
+	mint4	m_nAlarmType;		//告警类型
+	mint8	m_llRemindTime;		//告警、提醒时间(激活时为首次通话时间)
+	mint4   m_oriType;	//提醒来源
+	mint1	m_szNotifyBuf[200];	//后续字段区
+	//CAlarmInfo format:[m_nProdID(int64),m_nItemID(int64),m_llValidDate(int64),m_llExpireDate(int64)]
+	//CRemaidInfo format:[m_llAcctID(int64),m_llBookID(int64),m_llCdrTime(int64),m_llLatestTime(int64),
+	//m_llLastTime(int64),m_szLatestAreaCode(char),m_szLastAreaCode(char),m_szOppPhoneNumber(char)]
+	//括号只表示地段类型，实际组包中并不包含
+
+	BEGIN_SOCK_PKG_DESC
+		PKG_SOCK_FIELD(m_llServID)
+		//PKG_SOCK_FIELD(m_szPhoneNumber)
+		PKG_SOCK_FIELD(m_nRegionCode)
+		PKG_SOCK_FIELD(m_nServiceID)
+		PKG_SOCK_FIELD(m_llThreshold)
+		PKG_SOCK_FIELD(m_llLimit)
+		PKG_SOCK_FIELD(m_llUsed)
+		PKG_SOCK_FIELD(m_nAlarmType)
+		PKG_SOCK_FIELD(m_llRemindTime)
+		PKG_SOCK_FIELD(m_oriType)
+		//PKG_SOCK_FIELD(m_szNotifyBuf)
+	END_SOCK_PKG_DESC
+
+public:
+	CNotifyInfo()	{ memset(this, 0x00, sizeof(*this)); }    
+	void set_data(CAMTNotificationInfo1 &cNotifyInfo); 
+	void set_data(CAMTNotificationInfo2 &cNotifyInfo);     
+			
+};
+
+class CNotifyInfoList
+{
+public:
+	mint8	m_nNumber;	//有效的记录数
+	
+BEGIN_SOCK_PKG_DESC
+	PKG_SOCK_FIELD(m_nNumber)
+	PKG_SOCK_FIELD_LIST(m_nNumber, CNotifyInfo)
+END_SOCK_PKG_DESC
+
+	CNotifyInfoList()
+	{
+		memset( (void*)this, 0, sizeof( *this ) ); 
+	}
+
+	inline CNotifyInfo *get_item(mint4 nIndex) const
+	{
+		if(nIndex < 0 || nIndex >= m_nNumber)
+			return NULL;
+
+		return (CNotifyInfo *)(((char *)this) 
+				+ AISIZEOF(CNotifyInfoList) 
+				+ nIndex * AISIZEOF(CNotifyInfo));
+	}
+};
+
+//-------------------------------------------------------------------------------------
+//
+//  Name: 通话场景信息表
+//  Desc: This table keeps  
+//                              
+//-------------------------------------------------------------------------------------
+class CDialogInfoRecord
+{
+public:
+	mint8	m_llServID;		//服务编号
+	mint4	m_nServiceId;		//业务
+	mint8	m_llStartTime;		//最近一次通话时间
+	mint1	m_szAreaCode[32];	//通话地点
+	mint4	m_nRegionCode;		//地区编号
+	mint8	m_llReserve;
+	
+	BEGIN_SOCK_PKG_DESC
+		PKG_SOCK_FIELD(m_llServID)
+		PKG_SOCK_FIELD(m_nServiceId)
+		PKG_SOCK_FIELD(m_llStartTime)
+		//PKG_SOCK_FIELD(m_szAreaCode)
+		PKG_SOCK_FIELD(m_nRegionCode)
+		PKG_SOCK_FIELD(m_llReserve)
+	END_SOCK_PKG_DESC
+public:
+	CDialogInfoRecord() { memset(this, 0x00, sizeof(*this)); }
+	void set_data(CAMTDialogInfo &cDialogInfo); 
+};
+
+class CDialogInfoRecordList
+{
+public:
+	mint8	m_nNumber;	//有效的记录数
+	
+BEGIN_SOCK_PKG_DESC
+	PKG_SOCK_FIELD(m_nNumber)
+	PKG_SOCK_FIELD_LIST(m_nNumber, CDialogInfoRecord)
+END_SOCK_PKG_DESC
+
+	CDialogInfoRecordList()
+	{
+		memset( (void*)this, 0, sizeof( *this ) ); 
+	}
+
+	inline CDialogInfoRecord *get_item(mint4 nIndex) const
+	{
+		if(nIndex < 0 || nIndex >= m_nNumber)
+			return NULL;
+
+		return (CDialogInfoRecord *)(((char *)this) 
+				+ AISIZEOF(CDialogInfoRecordList) 
+				+ nIndex * AISIZEOF(CDialogInfoRecord));
+	}
+};
+//-------------------------------------------------------------------------------------
+//
+//  Name: 赠送奖励信息
+//  Desc: This table keeps  
+//                              
+//-------------------------------------------------------------------------------------
+class CBonusInfoRecord
+{
+public:
+	mint8	m_llServID;	//服务编号
+	mint4	m_nBonusTime;	//已赠送次数
+	mint4	m_nBonusProd;	//赠送产品
+	mint4	m_nBonusItem;	//赠送科目
+	mint4	m_nRegionCode;	//地区编号
+	mint8	m_llValidDate;	//累计生效日期
+	mint8	m_llExpireDate;	//累计失效日期
+	
+	BEGIN_SOCK_PKG_DESC
+		PKG_SOCK_FIELD(m_llServID)
+		PKG_SOCK_FIELD(m_nBonusTime)
+		PKG_SOCK_FIELD(m_nBonusProd)
+		PKG_SOCK_FIELD(m_nBonusItem)
+		PKG_SOCK_FIELD(m_nRegionCode)
+		PKG_SOCK_FIELD(m_llValidDate)
+		PKG_SOCK_FIELD(m_llExpireDate)
+	END_SOCK_PKG_DESC  
+public:
+	CBonusInfoRecord(){ memset(this, 0x00, sizeof(*this)); }
+	void set_data(CAMTBonusInfo &cBonusInfo); 
+};
+
+class CBonusInfoRecordList
+{
+public:
+	mint8	m_nNumber;	//有效的记录数
+	
+BEGIN_SOCK_PKG_DESC
+	PKG_SOCK_FIELD(m_nNumber)
+	PKG_SOCK_FIELD_LIST(m_nNumber, CBonusInfoRecord)
+END_SOCK_PKG_DESC
+
+	CBonusInfoRecordList()
+	{
+		memset( (void*)this, 0, sizeof( *this ) ); 
+	}
+
+	inline CBonusInfoRecord *get_item(mint4 nIndex) const
+	{
+		if(nIndex < 0 || nIndex >= m_nNumber)
+			return NULL;
+
+		return (CBonusInfoRecord *)(((char *)this) 
+				+ AISIZEOF(CBonusInfoRecordList) 
+				+ nIndex * AISIZEOF(CBonusInfoRecord));
+	}
+};
+//-------------------------------------------------------------------------------------
+//  Name: 用户租金明细表
+//  Desc: 
+//-------------------------------------------------------------------------------------
+class CRentFeeDetail
+{
+public:
+        mint8 m_llServID;
+        mint4 m_nProdId;
+        mint8 m_llSoId;
+        mint8 m_llUnPayedFee; //未付费用
+        mint4 m_nTimes;             //尝试扣款次数
+	mint4 m_nRegionCode;	//地区编号
+        
+        BEGIN_SOCK_PKG_DESC
+		PKG_SOCK_FIELD(m_llServID)
+		PKG_SOCK_FIELD(m_nProdId)
+		PKG_SOCK_FIELD(m_llSoId)
+		PKG_SOCK_FIELD(m_llUnPayedFee)
+		PKG_SOCK_FIELD(m_nTimes) 
+		PKG_SOCK_FIELD(m_nRegionCode)
+	END_SOCK_PKG_DESC
+public:		
+	CRentFeeDetail(){ memset(this, 0x00, sizeof(*this)); }
+	void set_data(CAMTRentFeeDetail &cRentFeeDetail); 
+};
+
+
+class CRentFeeDetailList
+{
+public:
+	mint8	m_nNumber;	//有效的记录数
+	
+BEGIN_SOCK_PKG_DESC
+	PKG_SOCK_FIELD(m_nNumber)
+	PKG_SOCK_FIELD_LIST(m_nNumber, CRentFeeDetail)
+END_SOCK_PKG_DESC
+
+	CRentFeeDetailList()
+	{
+		memset( (void*)this, 0, sizeof( *this ) ); 
+	}
+
+	inline CRentFeeDetail *get_item(mint4 nIndex) const
+	{
+		if(nIndex < 0 || nIndex >= m_nNumber)
+			return NULL;
+
+		return (CRentFeeDetail *)(((char *)this) 
+				+ AISIZEOF(CRentFeeDetailList) 
+				+ nIndex * AISIZEOF(CRentFeeDetail));
+	}
+};
+//-------------------------------------------------------------------------------------
+//  Name: 用户租金账本信息表
+//  Desc: 
+//-------------------------------------------------------------------------------------
+class CRentFeeBookInfo
+{
+public:
+        mint8 m_llServID;
+        mint4 m_nProdId;
+        mint8 m_llSoId;
+        mint8 m_llAcctId;
+        mint8 m_llAcctBookId;
+        mint8 m_llFreezeFee;
+	mint4 m_nRegionCode;	//地区编号
+        mint4 m_nItemID;
+
+       BEGIN_SOCK_PKG_DESC
+		PKG_SOCK_FIELD(m_llServID)
+		PKG_SOCK_FIELD(m_nProdId)
+		PKG_SOCK_FIELD(m_llSoId)
+		PKG_SOCK_FIELD(m_llAcctId)
+		PKG_SOCK_FIELD(m_llAcctBookId)
+		PKG_SOCK_FIELD(m_llFreezeFee)
+		PKG_SOCK_FIELD(m_nRegionCode)
+		PKG_SOCK_FIELD(m_nItemID)
+	END_SOCK_PKG_DESC
+public:
+	CRentFeeBookInfo() { memset(this, 0x00, sizeof(*this)); }
+	void set_data(CAMTRentFeeBookInfo &cRentFeeBookInfo); 
+	
+};
+
+class CRentFeeBookInfoList
+{
+public:
+	mint8	m_nNumber;	//有效的记录数
+	
+BEGIN_SOCK_PKG_DESC
+	PKG_SOCK_FIELD(m_nNumber)
+	PKG_SOCK_FIELD_LIST(m_nNumber, CRentFeeBookInfo)
+END_SOCK_PKG_DESC
+
+	CRentFeeBookInfoList()
+	{
+		memset( (void*)this, 0, sizeof( *this ) ); 
+	}
+
+	inline CRentFeeBookInfo *get_item(mint4 nIndex) const
+	{
+		if(nIndex < 0 || nIndex >= m_nNumber)
+			return NULL;
+
+		return (CRentFeeBookInfo *)(((char *)this) 
+				+ AISIZEOF(CRentFeeBookInfoList) 
+				+ nIndex * AISIZEOF(CRentFeeBookInfo));
+	}
+};
+//-------------------------------------------------------------------------------------
+//
+//  Name: 用户免费资源累计日志表
+//  Desc: 
+//
+//-------------------------------------------------------------------------------------
+class CShareFreeResLog
+{        
+public:
+	mint8 	m_llMajorServID;	//主体服务编号
+	mint8	m_llServID;		//客体服务编号
+	mint8	m_llDoneCode;		//流水号
+	mint4	m_nRegionCode;		//地区编号
+	mint4   m_nProdID;		//产品编号
+	mint4	m_nItemID;		//科目代码
+	mint8	m_llFreeResLimit;	//免费资源累计
+	mint8	m_llValidDate;		//生效时间(时间型YYYYMMDDHHMISS)
+	mint8	m_llExpireDate;		//失效时间(时间型YYYYMMDDHHMISS)
+	mint8	m_llFreeResUsed;	//计费累计字段
+	mint8	m_llRiskFreeResUsed;	//欠控累计字段
+	mint8	m_llUsedTime;   	//免费资源使用时间
+	mint4	m_dtModiTime;		//修改时间time_t
+	
+	
+	BEGIN_SOCK_PKG_DESC
+		PKG_SOCK_FIELD(m_llMajorServID)
+		PKG_SOCK_FIELD(m_llServID)
+		PKG_SOCK_FIELD(m_llDoneCode)
+		PKG_SOCK_FIELD(m_nRegionCode)
+		PKG_SOCK_FIELD(m_nProdID)
+		PKG_SOCK_FIELD(m_nItemID)
+		PKG_SOCK_FIELD(m_llFreeResLimit)
+		PKG_SOCK_FIELD(m_llValidDate)
+		PKG_SOCK_FIELD(m_llExpireDate)
+		PKG_SOCK_FIELD(m_llFreeResUsed)
+		PKG_SOCK_FIELD(m_llRiskFreeResUsed)
+		PKG_SOCK_FIELD(m_llUsedTime)
+		PKG_SOCK_FIELD(m_dtModiTime)
+	END_SOCK_PKG_DESC
+	
+public:
+	CShareFreeResLog()  { memset(this,0x00, sizeof(*this));	}   
+	void set_data(CAMTShareFreeResLog &cShareFreeResLog);  
+};     
+
+
+
+class CShareFreeResLogList
+{
+public:
+	mint8	m_nNumber;	//有效的记录数
+	
+BEGIN_SOCK_PKG_DESC
+	PKG_SOCK_FIELD(m_nNumber)
+	PKG_SOCK_FIELD_LIST(m_nNumber, CShareFreeResLog)
+END_SOCK_PKG_DESC
+
+	CShareFreeResLogList()
+	{
+		memset( (void*)this, 0, sizeof( *this ) ); 
+	}
+
+	inline CShareFreeResLog *get_item(mint4 nIndex) const
+	{
+		if(nIndex < 0 || nIndex >= m_nNumber)
+			return NULL;
+
+		return (CShareFreeResLog *)(((char *)this) 
+				+ AISIZEOF(CShareFreeResLogList) 
+				+ nIndex * AISIZEOF(CShareFreeResLog));
+	}
+};
+//-------------------------------------------------------------------------------------
+//
+//  Name: 提醒次数纪录表
+//  Desc: 
+//
+//-------------------------------------------------------------------------------------
+class CAlertTimesInfo
+{        
+public:
+	mint8	m_llServID;		
+	mint4	m_oriType;
+	mint4	m_nWay;
+	mint4	m_nAlertTimes;
+	mint4	m_nRegionCode;
+	mint8	m_llValidDate;		
+	mint8	m_llExpireDate;		
+
+	BEGIN_SOCK_PKG_DESC
+		PKG_SOCK_FIELD(m_llServID)
+		PKG_SOCK_FIELD(m_oriType)
+		PKG_SOCK_FIELD(m_nWay)
+		PKG_SOCK_FIELD(m_nAlertTimes)
+		PKG_SOCK_FIELD(m_nRegionCode)
+		PKG_SOCK_FIELD(m_llValidDate)
+		PKG_SOCK_FIELD(m_llExpireDate)
+	END_SOCK_PKG_DESC
+	
+public:
+	CAlertTimesInfo()  { memset(this,0x00, sizeof(*this));	}
+	void set_data(CAMTAlertTimesInfo &cAlertTimesInfo);     
+};     
+
+
+
+class CAlertTimesInfoList
+{
+public:
+	mint8	m_nNumber;	//有效的记录数
+	
+BEGIN_SOCK_PKG_DESC
+	PKG_SOCK_FIELD(m_nNumber)
+	PKG_SOCK_FIELD_LIST(m_nNumber, CAlertTimesInfo)
+END_SOCK_PKG_DESC
+
+	CAlertTimesInfoList()
+	{
+		memset( (void*)this, 0, sizeof( *this ) ); 
+	}
+
+	inline CAlertTimesInfo *get_item(mint4 nIndex) const
+	{
+		if(nIndex < 0 || nIndex >= m_nNumber)
+			return NULL;
+
+		return (CAlertTimesInfo *)(((char *)this) 
+				+ AISIZEOF(CAlertTimesInfoList) 
+				+ nIndex * AISIZEOF(CAlertTimesInfo));
+	}
+};
+//-------------------------------------------------------------------------------------
+//
+//  Name: 预算信息表
+//  Desc: 
+//
+//-------------------------------------------------------------------------------------
+class CBudgetInfo
+{        
+public:
+	mint8 m_llServID;
+	mint8 m_llBudgetFee;	//已使用的预算费用
+	mint4 m_nItemID;
+	mint4 m_nRegionCode;
+	mint8 m_llCycleDate;
+	mint8 m_llValidDate;
+	mint8 m_llExpireDate;
+
+	BEGIN_SOCK_PKG_DESC
+		PKG_SOCK_FIELD(m_llServID)
+		PKG_SOCK_FIELD(m_llBudgetFee)
+		PKG_SOCK_FIELD(m_nItemID)
+		PKG_SOCK_FIELD(m_nRegionCode)
+		PKG_SOCK_FIELD(m_llCycleDate)
+		PKG_SOCK_FIELD(m_llValidDate)
+		PKG_SOCK_FIELD(m_llExpireDate)
+	END_SOCK_PKG_DESC
+	
+public:
+	CBudgetInfo()  { memset(this,0x00, sizeof(*this));}  
+	void set_data(CAMTBudgetInfo &cBudgetInfo);      
+};     
+
+class CBudgetInfoList
+{
+public:
+	mint8	m_nNumber;	//有效的记录数
+	
+BEGIN_SOCK_PKG_DESC
+	PKG_SOCK_FIELD(m_nNumber)
+	PKG_SOCK_FIELD_LIST(m_nNumber, CBudgetInfo)
+END_SOCK_PKG_DESC
+
+	CBudgetInfoList()
+	{
+		memset( (void*)this, 0, sizeof( *this ) ); 
+	}
+
+	inline CBudgetInfo *get_item(mint4 nIndex) const
+	{
+		if(nIndex < 0 || nIndex >= m_nNumber)
+			return NULL;
+
+		return (CBudgetInfo *)(((char *)this) 
+				+ AISIZEOF(CBudgetInfoList) 
+				+ nIndex * AISIZEOF(CBudgetInfo));
+	}
+};
+
+
+
+//-------------------------------------------------------------------------------------
+//
+//  Name: 查询记录消息结构
+//  Desc: 
+//
+//-------------------------------------------------------------------------------------
+
+
+#define MAX_NAME_LEN 64
+#define MAX_FIELD_VALUE 256
+
+//查询条件字段及值
+class CFieldInfo
+{
+  public:
+
+	/*m_nType 取值类型如下
+	enum
+	{
+		F_CMP_TYPE_EQUAL = 0,
+		F_CMP_TYPE_NOT_EQUAL,
+		F_CMP_TYPE_LESS,
+		F_CMP_TYPE_LESS_EQUAL,
+		F_CMP_TYPE_GREATER,
+		F_CMP_TYPE_GREATER_EQUAL,
+		F_CMP_TYPE_LIKE
+	};
+	*/
+	mint4			m_nType; 			//equal,greater, less, in etc
+
+	/*m_nOptType 取值如下
+	enum
+	{
+		F_OPT_TYPE_AND = 0,
+		F_OPT_TYPE_OR
+	};*/
+	mint4			m_nOptType;	//tkn_and, tkn_or
+        char m_szFieldName[MAX_NAME_LEN]; //字段名
+ 	mint4 m_nFieldType;   
+	/*
+	m_nFieldType类型 取值如下
+	enum
+		{
+	         TYPE_CHAR = 0,
+			TYPE_SHORT,
+			TYPE_DATE,
+			TYPE_LONG,
+			TYPE_LONGLONG,
+			TYPE_FLOAT,
+			TYPE_DOUBLE,
+	        TYPE_CHAR_ARRAY
+	}
+	
+	TYPE_CHAR_ARRAY 写m_szFieldValue；
+	其它类型写m_llFieldValue
+	*/
+	mint8 m_llFieldValue;
+	//mreal8 m_dFieldValue ;
+	char  m_szFieldValue[MAX_FIELD_VALUE];
+
+	BEGIN_SOCK_PKG_DESC
+		PKG_SOCK_FIELD(m_nType)
+		PKG_SOCK_FIELD(m_nOptType)
+		PKG_SOCK_FIELD(m_nFieldType)
+		PKG_SOCK_FIELD(m_llFieldValue)
+		//PKG_SOCK_FIELD(m_dFieldValue)
+	END_SOCK_PKG_DESC
+
+	CFieldInfo()
+	{
+		memset((void *)this, 0 , sizeof(*this));
+	}
+};
+
+
+class CQueryTableInfo
+{
+public:	
+	mint4 m_nRegionCode; //mdb_proxy根据regincode来决定路由到那个MDB
+    	mint4 m_nFieldNum;  //查询条件的个数
+	char m_szTableName[MAX_NAME_LEN]; //表名
+	
+	BEGIN_SOCK_PKG_DESC
+		PKG_SOCK_FIELD(m_nRegionCode)
+		PKG_SOCK_FIELD(m_nFieldNum)
+	END_SOCK_PKG_DESC
+	
+	CQueryTableInfo()
+	{
+		memset((void *)this, 0 , sizeof(*this));
+	}
+
+	CFieldInfo *get_fieldinfo(mint4 nIndex)
+	{
+		if(nIndex < 0 || nIndex > m_nFieldNum)
+			return NULL;
+
+		return (CFieldInfo*)((char *)this + AISIZEOF(CQueryTableInfo) + nIndex * AISIZEOF(CFieldInfo));
+	}
+
+};
+#endif //_RATMS_TABLE_RECORD_H_

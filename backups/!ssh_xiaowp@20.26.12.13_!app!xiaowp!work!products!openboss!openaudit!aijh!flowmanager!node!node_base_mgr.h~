@@ -1,0 +1,65 @@
+#ifndef _NODE_INTERFACE_H
+#define _NODE_INTERFACE_H
+#include "dmcext_audit_mgr.h"
+#include "base_func.h"
+#include "thread_value.h"
+#include "openbroker/OBClient.h"
+#include "openbroker/svr_ctrl.h"
+#include "ob_session.h"
+#include "ob_kernel.h"
+#include "tool.h"
+
+
+
+//实现某个业务类 begin
+class CNodeAbstractBase
+{
+public:
+//声明需要派生类实现的接
+
+virtual int pause
+		(SOBSession* pSession,
+		int64 llTaskId,
+		int32 nInstId,
+		CBSErrorMsg& cErrorMsg );
+virtual int reset
+		(SOBSession* pSession,
+		int64 llTaskId,
+		int32 nInstId,
+		CBSErrorMsg& cErrorMsg );
+virtual	int rehandle
+		(SOBSession* pSession,
+		int64 llTaskId,
+		int32 nInstId,
+		CBSErrorMsg& cErrorMsg );
+
+virtual int resume
+		(SOBSession* pSession,
+		int64 llTaskId,
+		int32 nInstId,
+		CBSErrorMsg& cErrorMsg );
+
+virtual int stop
+		(SOBSession* pSession,
+		int64 llTaskId,
+		int32 nInstId,
+		CBSErrorMsg& cErrorMsg );
+
+virtual int checkPass
+		(SOBSession* pSession,
+		int64 llTaskId,
+		int32 nInstId,
+		CBSErrorMsg& cErrorMsg );
+
+virtual	int checkNoPass
+		(SOBSession* pSession,
+		int64 llTaskId,
+		int32 nInstId,
+		CBSErrorMsg& cErrorMsg );
+
+};
+
+typedef CNodeAbstractBase* p_new();
+typedef void p_delete(CNodeAbstractBase*);
+
+#endif

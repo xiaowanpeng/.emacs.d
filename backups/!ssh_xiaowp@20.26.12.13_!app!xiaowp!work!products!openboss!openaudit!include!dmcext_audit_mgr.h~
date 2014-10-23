@@ -1,0 +1,44 @@
+ /*
+ * @file dmcext_audit_mgr.h
+ * @brief  mgr layer for audit
+ * @author huangkun, huangkun@asiainfo-linkage.com
+ * @copyright(c) 2003-2012, Asiainfo HangZhou. All rights reserved.
+ * @version 1.0
+ * @date 2011-08-23
+ */
+
+#ifndef _DMC_AUDIT_MGR_H_
+#define _DMC_AUDIT_MGR_H_
+
+//#include "dmcext_template_mgr.h"
+#include "dmcext_template_mgr.cpp"
+#include "FlowManager_db_obd_c.h"
+#include <memory>
+
+using namespace MFlowManagerDb;
+
+class SOBSession;
+
+class CDmcextAuditMgr
+{
+public:
+  
+    static std::auto_ptr< CDmcextTemplateMgr<CFmFlowDefineList> > getFmFlowDefine(SOBSession* pSession);
+    static std::auto_ptr< CDmcextTemplateMgr<CFmFlowNodeInfoList> > getFmFlowNodeInfo(SOBSession* pSession);
+    static std::auto_ptr< CDmcextTemplateMgr<CFmFlowNodeParamList> > getFmFlowNodeParam(SOBSession* pSession);
+    static std::auto_ptr< CDmcextTemplateMgr<CFmFlowNodeRelationList> > getFmFlowNodeRelation(SOBSession* pSession);
+    static std::auto_ptr< CDmcextTemplateMgr<CFmNodeDefineList> > getFmNodeDefine(SOBSession* pSession);
+    static std::auto_ptr< CDmcextTemplateMgr<CFmNodeParamDefineList> > getFmNodeParamDefine(SOBSession* pSession);
+    static std::auto_ptr< CDmcextTemplateMgr<CFmNodeScriptDefineList> > getFmNodeScriptDefine(SOBSession* pSession);
+    static std::auto_ptr< CDmcextTemplateMgr<CFmPlanList> > getFmPlan(SOBSession* pSession);
+    static std::auto_ptr< CDmcextTemplateMgr<CFmPlanParamList> > getFmPlanParam(SOBSession* pSession);
+    static std::auto_ptr< CDmcextTemplateMgr<CFmTaskLogList> > getFmTaskLog(SOBSession* pSession);
+    static std::auto_ptr< CDmcextTemplateMgr<CFmTaskNodeInfoList> > getFmTaskNodeInfo(SOBSession* pSession);
+  
+protected:
+    CDmcextAuditMgr();
+    virtual ~CDmcextAuditMgr();
+    CDmcextAuditMgr( const CDmcextAuditMgr& );
+    CDmcextAuditMgr* operator=( const CDmcextAuditMgr& );
+};
+#endif

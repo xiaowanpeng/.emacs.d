@@ -1,0 +1,36 @@
+#ifndef _NODE_INTERFACE_H
+#define _NODE_INTERFACE_H
+
+
+// 节点基类
+class CNodeAbstractBase
+{
+protected:
+// 可以定义一些属性
+int m_iTaskId;
+int m_iObjId;
+
+
+public:
+CNodeAbstractBase() {} // 初始化属性: 任务号，节点号等 
+virtual ~ CNodeAbstractBase() {}
+
+
+public:
+//声明需要派生类实现的接口
+virtual int init() = 0;
+virtual int run() = 0;
+virtual int redo() = 0;
+virtual int resume() = 0;
+virtual int pause() = 0;
+virtual int stop() = 0;
+virtual int clean() = 0;
+//virtual int polling() = 0;
+};
+
+
+typedef CNodeAbstractBase* p_new();
+typedef void p_delete(CNodeAbstractBase*);
+
+
+#endif

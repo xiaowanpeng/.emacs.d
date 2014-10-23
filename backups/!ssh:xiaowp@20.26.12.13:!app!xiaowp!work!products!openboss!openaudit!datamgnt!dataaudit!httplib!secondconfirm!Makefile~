@@ -1,0 +1,79 @@
+#kefile for Mgr.
+# Layer: Mgr
+############################################################################################
+
+DEBUG=1
+OB_TIER=MGR
+DLLTAIL=so
+
+DATAMGNT_PUBLIC=../../public
+
+
+#指定子系统的路径
+#SUBSYSTEM_ROOT =$(DBC_SRC)
+#include $(DBC_SRC)/subdef.mk
+
+### 定义模块主目录和模块名称
+### 修改MODULE_COMMON 及 MODULE_COMMON_PATH 为自己在subdef.mk文件中的相应定义
+MODULE =second_confirm_interface
+#MODULE_PATH =$(MODULE_AUDIT_PATH)
+# 定义目标，目标只需要定义模块名称即可以，其他通过替换来完成  TIER_MGR=_mgr
+PRODDEST=lib$(MODULE)$(DLLTAIL)
+
+# define idl path   ,接口描述语言的路径，涉及odb。
+#PRODIDLPATH=.						\
+	    ../flowmanager/kernel
+
+# define message path
+#PRODMSGPATH=$(DBC_SRC)/message
+
+# PRODIDLPATH and PRODDEST must set before this include
+include $(OB_REL)/etc/Cmake
+
+# define definition when build debug
+PRODDEBUGDEFS=-D_AI_MONITOR_PERFORMANCE_ -DOTL_STL -DOTL_ORA10G_R2 -DDB_TYPE_ORA
+
+# define temp file. when make clean it will be clean.
+PRODTMPOBJ=
+
+# define lib path
+PRODLIBPATH=. $(OB_REL)/lib $(ORACLE_HOME)/lib32
+
+# define lib
+PRODLIBS=des$(BUILDTYPE)	\
+		 DMCTinyXml$(BUILDTYPE)  \
+                 flow_template_mgrD \
+
+
+# define include path
+PRODINCS=.									\
+		$(OB_REL)/include					\
+		$(OB_REL)/include/common 			\
+		$(OB_REL)/include/obcommon          \
+		$(ORACLE_HOME)/rdbms/demo 			\
+		$(ORACLE_HOME)/rdbms/public         \
+		$(ORACLE_HOME)/plsql/public         \
+		$(ORACLE_HOME)/network/public       \
+		../kernel                           \
+                ../mgr                              \
+                ../include                          \
+		$(DATAMGNT_PUBLIC)/tinyxml    \
+		$(DATAMGNT_PUBLIC)/toolfunc    \
+		$(DATAMGNT_PUBLIC)/socket    \
+		$(DATAMGNT_PUBLIC)/tool    \
+		$(ALARM_PATH)/mgr/flowconfig    \
+
+
+# 生成的.o 文件列表，必须指定 
+OBJS=$(MODULE).o    	\
+
+
+$(PRODDEST):$(DS_SERVICE_DEP) $(OBJS)
+	$(SHLD) $(OBJS) $(SHLDFLAGS) $(LDOPTS) -o $@
+
+# define install rules
+install:$(PRODDEST)
+	cp -rf $(PRODDEST) $(OB_REL)/lib
+update:$(PRODDEST)
+	/app/huangkun/script/ftp.sh lib $(PRODDEST)
+

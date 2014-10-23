@@ -1,0 +1,22 @@
+(in-package algorithm)
+
+(defmacro define-pos-cal (func-name cal-exp)
+  `(defun ,func-name (hp i)
+     (if (< 0 ,cal-exp (length hp)) ,cal-exp nil)))
+
+(define-pos-cal left-pos (* 2 i))
+(define-pos-cal right-pos (+ 1 (* 2 i)))
+(define-pos-cal parent-pos (multiple-value-bind (a b) (floor (/ i 2)) (* 0 b) a))
+
+(defun max-pos (hp &rest pos-lst)
+  (reduce (lambda (pos1 pos2)
+            (cond ((not (and pos1 pos2)) (or pos1 pos2))
+                  ((>= (aref hp pos1) (aref hp pos2)) pos1)
+                  (t pos2)))
+          pos-lst))
+
+(defun max-heapify (hp i)
+  (let ((max-pos (max-pos hp i (left-pos hp i) (right-pos hp i))))
+    (unless (= max-pos i)
+      (rotatef (aref hp i) (aref hp max-pos))
+      (max-heapify hp max-pos))))

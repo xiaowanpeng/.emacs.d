@@ -1,0 +1,54 @@
+#include <iostream>
+#include <vector>
+#include <map>
+
+using namespace std;
+
+int main()
+{
+/*    vector<int> v_int;
+    v_int.push_back(0);
+    v_int.push_back(1);
+    v_int.push_back(2);
+    v_int.push_back(3);
+    v_int.push_back(4);
+    
+    vector<int>::iterator itr;
+    for (itr = v_int.begin(); itr != v_int.end(); itr ++)
+    {
+        cout << *itr << endl;
+
+        if (*itr == 2)
+        {
+            v_int.erase(itr);
+            cout <<"****" << *itr << "***" << endl;
+            itr--;
+            cout <<"****" << *itr << "***" << endl;
+            continue;
+        }
+    }
+
+    for (itr = v_int.begin(); itr != v_int.end(); itr ++)
+    {
+        cout << *itr << endl;
+        }*/
+
+    map<int, string> mp;
+    mp[1] = "1";
+    mp[2] = "2";
+
+    map<int, string>::iterator itr;
+    for (itr = mp.begin(); itr != mp.end(); itr ++)
+    {
+        cout << itr->first << " : " << itr->second << endl;
+    }
+
+    mp.erase(mp.find(1));
+
+    for (itr = mp.begin(); itr != mp.end(); itr ++)
+    {
+        cout << itr->first << " : " << itr->second << endl;
+    }
+
+    return 0;
+}

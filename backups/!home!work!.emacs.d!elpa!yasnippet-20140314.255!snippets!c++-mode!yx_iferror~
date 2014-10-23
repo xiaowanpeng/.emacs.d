@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: iferror
+# key: iferror
+# --
+if ($1 (
+        pSession,$0
+        cErrorMsg))
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","call $1 error.");
+    return ${2:OBD_FAIL};
+}

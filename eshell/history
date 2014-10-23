@@ -1,0 +1,9 @@
+ls
+ls
+cdbd
+cp -r /media/xiaowp/DATA/backup/home_work/.eshell ./
+ls
+ll
+ls
+ls -al
+exit

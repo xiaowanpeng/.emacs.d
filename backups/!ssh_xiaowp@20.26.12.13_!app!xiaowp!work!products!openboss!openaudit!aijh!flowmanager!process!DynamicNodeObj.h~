@@ -1,0 +1,38 @@
+#ifndef _DYNAMIC_NODE_OBJ_H_
+#define _DYNAMIC_NODE_OBJ_H_
+
+#include "dmcext_audit_mgr.h"
+#include "node_base_mgr.h"
+
+using namespace MFlowManagerDb;
+
+class SOBSession;
+
+
+class DynamicNodeObj
+{
+public:
+    DynamicNodeObj
+      (SOBSession* pSession,
+       const int64& llTaskId,
+       const int32& nInstId,
+       CBSErrorMsg& cErrorMsg);
+
+    ~DynamicNodeObj();
+
+    CNodeAbstractBase* get_nodeObj();
+
+private:
+    int init_nodeObj
+      (SOBSession* pSession,
+       const int64& llTaskId,
+       const int32& nInstId,
+       CBSErrorMsg& cErrorMsg);
+      
+private:
+    CNodeAbstractBase* m_pNodeObj;
+    void* m_pDll;
+    p_delete* m_pDeleteNodeObj;
+};
+
+#endif

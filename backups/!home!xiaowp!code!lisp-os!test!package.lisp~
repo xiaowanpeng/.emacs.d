@@ -1,0 +1,8 @@
+(defpackage protect
+  (:use :cl))
+
+(defpackage lisp-os
+  (:use :protect))
+
+(defpackage lisp-os-test
+  (:use :cl))

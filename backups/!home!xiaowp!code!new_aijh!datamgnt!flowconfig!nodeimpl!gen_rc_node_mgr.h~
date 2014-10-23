@@ -1,0 +1,17 @@
+#ifndef _REPAIRCONFIRM_NODE_H_
+#define _REPAIRCONFIRM_NODE_H_
+
+#include "node_base_mgr.h"
+
+class RepairconfirmNode : public CNodeAbstractBase
+{
+public:
+    virtual int run
+      (SOBSession* pSession,
+       const int64& llTaskId,
+       const int32& nInstId,
+       const AISTD string& strXmlParam,
+       CBSErrorMsg& cErrorMsg );
+};
+
+#endif

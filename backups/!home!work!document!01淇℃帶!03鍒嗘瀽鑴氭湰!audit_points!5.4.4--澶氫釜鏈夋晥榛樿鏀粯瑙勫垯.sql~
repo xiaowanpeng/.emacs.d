@@ -1,0 +1,16 @@
+shell script
+06.03boss_user_rule.sh
+
+sql script
+07.01boss_business_rule_check.sql
+
+
+
+insert into data_diff_boss_business_rule
+select  user_id,count(1) cnt,'boss_acc_user_rela','多个有效默认支付规则' from (
+select/*+parallel(a,5)*/ distinct a.user_id,a.acc_id from aicbs.boss_acc_user_rela a
+where a.valid_date<sysdate and a.expire_date>sysdate and a.pay_method=0
+)
+group by user_id
+having  count(1)>1;
+

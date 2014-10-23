@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ai_log
+# key: log
+# --
+LogAppend(DEBUG_LEVEL,"InfoLevel","$1");

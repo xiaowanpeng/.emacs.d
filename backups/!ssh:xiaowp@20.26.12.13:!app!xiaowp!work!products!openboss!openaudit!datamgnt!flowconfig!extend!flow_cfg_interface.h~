@@ -1,0 +1,13 @@
+#ifndef _GEN_FLOW_TASK_H_
+#define _GEN_FLOW_TASK_H_
+
+#include "flow_template_mgr.h"
+class SOBSession;
+
+int gen_flow_task
+        (SOBSession* pSession,
+         const int64& llSubtaskId,
+         const CAuditPlan& cAuditPlan,
+         CBSErrorMsg& cErrorMsg);
+
+#endif

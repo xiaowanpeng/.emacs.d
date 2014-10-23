@@ -1,0 +1,24 @@
+#!/bin/sh
+checkout(){
+	if [ `ps -ef |grep AuditDSServer |grep -v grep|grep 'AuditRepairServer.cfg -m REPAIR'|grep -v start_AuditRepairConfirmServer.sh |wc -l` -gt 0 ]
+		then
+		echo 1
+	else 
+		echo 0
+	fi
+}
+checkout
+sleep 1
+if [ `checkout`  -eq 0 ]
+then
+	$HOME/bin/AuditDSServer -i $HOME/config/AuditRepairServer.cfg -m REPAIR_CONFIRM > /dev/null &
+else
+	echo "The process of AuditRepairConfirmServer have been started !" ;exit
+fi
+sleep 1
+if [ `checkout` -eq 0 ]
+then 
+	echo "The process of AuditRepairConfirmServer has start failed !"
+else
+	echo "The process of AuditRepairConfirmServer have been started !" 
+fi

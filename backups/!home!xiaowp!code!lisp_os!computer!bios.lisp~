@@ -1,0 +1,9 @@
+(in-package bios)
+
+(defun run ()
+  (format t "power on ...~%")
+  (format t "check something ...~%")
+  (load-first-sector))
+
+(defun load-first-sector ()
+  (format t "load first sector ...~%"))

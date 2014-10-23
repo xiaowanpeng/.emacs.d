@@ -1,0 +1,332 @@
+#include "node_implement_mgr.h"
+#include <iostream>
+#define NODE_STS_UNHANDLED 0
+#define NODE_STS_RUNNING 2
+#define NODE_STS_SUCCESS 3
+#define NODE_STS_FAILD 4
+#define NODE_STS_HANG_UP 5
+#define NODE_STS_INTERRUPT 6
+#define NODE_STS_NEED_CHECK 7
+
+
+int Execution (
+    SOBSession* pSession,
+    const ob_whereCond& cFullSql,
+    int& nExecNum,
+    CBSErrorMsg& cErrorMsg )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter Execution ok.");
+
+    try
+    {
+        ob_kernel<CFmPlanList> cKernel( *pSession->get_dbConn(), SCHEME_NAME_AIJH);
+        nExecNum = cKernel.direct_execExt(cFullSql);
+    }
+    catch(CBSErrorMsg& cNewErrorMsg)
+    {
+        cErrorMsg = cNewErrorMsg;
+        return -1;
+    }
+
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave Execution ok.");
+    return 0;
+}
+
+int CNodeAbstractBase::pause 
+	(SOBSession* pSession,
+	int64 llTaskId,
+	int32 nInstId,
+	CBSErrorMsg& cErrorMsg )
+{
+	LogAppend(DEBUG_LEVEL,"InfoLevel","enter CNodeAbstractBase::node_pause ok.");
+    int nExecNum = 0;
+    ob_whereCond cFullSql;
+    cFullSql << OCS(" update fm_task_node_info set sts = ")
+             << NODE_STS_HANG_UP
+             << OCS(" where subtask_id = ")
+             << llTaskId
+             << OCS(" and inst_id = ")
+             << nInstId
+             << OCS(" and sts in ( ")
+             << NODE_STS_UNHANDLED
+             << OCS(" , ")
+             << NODE_STS_RUNNING
+             << OCS(" )");
+
+    if (Execution (
+            pSession,
+            cFullSql,
+            nExecNum,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call Execution error.");
+        return -1;
+    }
+
+    if (nExecNum != 1)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","update task_node_info hang up error, update num is not 1");
+        return -1;
+    }
+
+    pSession->get_dbConn()->commit();
+
+}
+int CNodeAbstractBase::reset
+	(SOBSession* pSession,
+	int64 llTaskId,
+	int32 nInstId,
+	CBSErrorMsg& cErrorMsg )	
+{
+
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter CNodeAbstractBase::node_reset ok.");
+
+    int nExecNum = 0;
+    ob_whereCond cFullSql;
+    cFullSql << OCS(" update fm_task_node_info set sts = ")
+             << NODE_STS_UNHANDLED
+             << OCS(" where subtask_id = ")
+             << llTaskId
+             << OCS(" and inst_id = ")
+             << nInstId
+             << OCS(" and sts = ")
+             << NODE_STS_SUCCESS;
+
+    if (Execution (
+            pSession,
+            cFullSql,
+            nExecNum,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call Execution error.");
+        return -1;
+    }
+
+    if (nExecNum != 1)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","update task_node_info reset error, update num is not 1");
+        return -1;
+    }
+
+    pSession->get_dbConn()->commit();
+
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave CNodeAbstractBase::node_reset ok.");
+    return 0;
+
+}
+int CNodeAbstractBase::rehandle
+	(SOBSession* pSession,
+	int64 llTaskId,
+	int32 nInstId,
+	CBSErrorMsg& cErrorMsg )
+{
+
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter CNodeAbstractBase::node_rehandle ok.");
+
+    int nExecNum = 0;
+    ob_whereCond cFullSql;
+    cFullSql << OCS(" update fm_task_node_info set sts = ")
+             << NODE_STS_UNHANDLED
+             << OCS(" where subtask_id = ")
+             << llTaskId
+             << OCS(" and inst_id = ")
+             << nInstId
+             << OCS(" and sts = ")
+             << NODE_STS_FAILD;
+
+    if (Execution (
+            pSession,
+            cFullSql,
+            nExecNum,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call Execution error.");
+        return -1;
+    }
+
+    if (nExecNum != 1)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","update task_node_info rehandle error, update num is not 1");
+        return -1;
+    }
+
+    pSession->get_dbConn()->commit();
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave CNodeAbstractBase::node_rehandle ok.");
+    return 0;
+
+}
+int CNodeAbstractBase::resume
+	(SOBSession* pSession,
+	int64 llTaskId,
+	int32 nInstId,
+	CBSErrorMsg& cErrorMsg )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter CNodeAbstractBase::node_resume ok.");
+
+    int nExecNum = 0;
+    ob_whereCond cFullSql;
+    cFullSql << OCS(" update fm_task_node_info set sts = ")
+             << NODE_STS_UNHANDLED
+             << OCS(" where subtask_id = ")
+             << llTaskId
+             << OCS(" and inst_id = ")
+             << nInstId
+             << OCS(" and sts = ")
+             << NODE_STS_HANG_UP;
+
+    if (Execution (
+            pSession,
+            cFullSql,
+            nExecNum,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call Execution error.");
+        return -1;
+    }
+
+    if (nExecNum != 1)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","update task_node_info resume error, update num is not 1");
+        return -1;
+    }
+
+    pSession->get_dbConn()->commit();
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave CNodeAbstractBase::node_resume ok.");
+    return 0;
+}
+int CNodeAbstractBase::stop
+	(SOBSession* pSession,
+	int64 llTaskId,
+	int32 nInstId,
+	CBSErrorMsg& cErrorMsg )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter CNodeAbstractBase::node_stop ok.");
+
+    int nExecNum = 0;
+    ob_whereCond cFullSql;
+    cFullSql << OCS(" update fm_task_node_info set sts = ")
+             << NODE_STS_INTERRUPT
+             << OCS(" where subtask_id = ")
+             << llTaskId
+             << OCS(" and inst_id = ")
+             << nInstId
+             << OCS(" and sts = ")
+             << NODE_STS_RUNNING;
+
+    if (Execution (
+            pSession,
+            cFullSql,
+            nExecNum,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call Execution error.");
+        return -1;
+    }
+
+    if (nExecNum != 1)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","update task_node_info interrupt error, update num is not 1");
+        return -1;
+    }
+    
+    pSession->get_dbConn()->commit();
+    return 0;
+
+
+}
+int CNodeAbstractBase::checkPass
+	(SOBSession* pSession,
+	int64 llTaskId,
+	int32 nInstId,
+	CBSErrorMsg& cErrorMsg )
+{
+
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter CNodeAbstractBase::node_checkPass ok.");
+    
+    int nExecNum = 0;
+    ob_whereCond cFullSql;
+    cFullSql << OCS(" update fm_task_node_info set sts = ")
+             << NODE_STS_SUCCESS
+             << OCS(" where subtask_id = ")
+             << llTaskId
+             << OCS(" and inst_id = ")
+             << nInstId
+             << OCS(" and sts = ")
+             << NODE_STS_NEED_CHECK;
+
+    if (Execution (
+            pSession,
+            cFullSql,
+            nExecNum,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call Execution error.");
+        return -1;
+    }
+
+    if (nExecNum != 1)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","update task_node_info checkpass error, update num is not 1");
+        return -1;
+    }
+
+    pSession->get_dbConn()->commit();
+
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave CNodeAbstractBase::node_checkPass ok.");
+    return 0;
+
+}
+int CNodeAbstractBase::checkNoPass
+	(SOBSession* pSession,
+	int64 llTaskId,
+	int32 nInstId,
+	CBSErrorMsg& cErrorMsg )
+{
+
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter CNodeAbstractBase::node_checkNoPass ok.");
+
+    int nExecNum = 0;
+    ob_whereCond cFullSql;
+    cFullSql << OCS(" update fm_task_node_info set sts = ")
+             << NODE_STS_FAILD
+             << OCS(" where subtask_id = ")
+             << llTaskId
+             << OCS(" and inst_id = ")
+             << nInstId
+             << OCS(" and sts = ")
+             << NODE_STS_NEED_CHECK;
+
+    if (Execution (
+            pSession,
+            cFullSql,
+            nExecNum,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call Execution error.");
+        return -1;
+    }
+
+    if (nExecNum != 1)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","update task_node_info checknopass error, update num is not 1");
+        return -1;
+    }
+
+    pSession->get_dbConn()->commit();
+
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave CNodeAbstractBase::node_checkNoPass ok.");
+    return 0;
+
+}
+
+extern "C"  CNodeAbstractBase    * New() {
+    return new CNodeAbstractBase;
+}
+extern "C" void Delete( CNodeAbstractBase    * p) {
+    delete p;
+}
+
+
+//实现某个业务类 end

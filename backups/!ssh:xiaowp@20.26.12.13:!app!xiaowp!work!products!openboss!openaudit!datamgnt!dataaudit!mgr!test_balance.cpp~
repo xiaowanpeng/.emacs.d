@@ -1,0 +1,87 @@
+#include "base_func.h"
+
+#include "thread_value.h"
+#include "openbroker/OBClient.h"
+#include "openbroker/svr_ctrl.h"
+#include "ob_session.h"
+#include "ob_kernel.h"
+#include "c_uni_socket.h"
+#include "tool.h"
+#include "socket_pool.h"
+
+#include "balance_cmp.h"
+
+
+AISTD string g_strConfigFile;
+AISTD string g_strModuleName;
+#define OBD_SESSION_NAME "_Session"
+
+
+int main(int argc, char *argv[])
+{
+    int     inch=0;
+    const char *chOptString="I:i:M:m:Hh";
+    while ((inch = getopt(argc, argv, chOptString)) != EOF)
+    {
+        switch (inch)
+        {	
+            case	'I':
+            case	'i':
+            {
+                g_strConfigFile = optarg;
+                break;
+            }
+            case	'M':
+            case	'm':
+            {
+                g_strModuleName = optarg;
+                break;
+            }
+            case 'H':
+            case 'h':
+            {
+                exit(0);
+            }	
+            default:
+            {
+                break;
+            }
+        }
+    }
+
+    g_strConfigFile = "test.cfg";
+    g_strModuleName = "test";
+    if(!init_server(g_strModuleName, argc, argv))
+    {
+        std::cerr<<"error!!"<<std::endl;
+        exit(0);
+    }
+
+    LogAppend(DEBUG_LEVEL,"InfoLevel","初始化数据库容器");
+    SOBSession *pSession;
+    CThreadValueHolder cThreadValueHolder; 
+    try                                   
+    {         	                 
+        if (CThreadValueMgr::set_value(OBD_SESSION_NAME, SOBSession()) < 0)                    
+        {                                                                                              
+            LogAppend(FATAL_LEVEL, "DebugInfo", "DEAL_CLIENT 初始化数据库容器错误!");                  
+            return -2;                                                                               
+        }                                                                                       
+        pSession = CThreadValueMgr::get_value<SOBSession>(OBD_SESSION_NAME);                   
+        pSession->m_pDbConn = pSession->get_dbConn();                                         
+    }                                                                                           
+    catch(...)                                                                                
+    {                                                                                        
+        LogAppend(FATAL_LEVEL, "DebugInfo", "初始化数据库容器错误!");              
+    }
+
+    CBSErrorMsg cErrorMsg;
+    
+    AISTD string strExper;
+    AISTD string strValue;
+    AISTD string strType;
+
+    BalanceCmp b;
+    b.compare(pSession, strExper, strValue, strType, NULL, cErrorMsg);
+    return 0;
+}

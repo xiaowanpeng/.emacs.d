@@ -1,0 +1,41 @@
+(require 'color-theme)
+
+;color-theme
+(color-theme-initialize)
+(color-theme-charcoal-black)
+
+;copy and paste with x-window
+(setq x-select-enable-clipboard t)
+
+;show line number
+(linum-mode)
+
+;use smex
+(global-set-key (kbd "M-x") 'smex)
+
+;hide tool bar
+(menu-bar-showhide-tool-bar-menu-customize-disable)
+
+;set background alpha
+(set-frame-parameter (selected-frame) 'alpha (list 90 80))
+
+;change window
+(global-set-key [(control tab)] 'other-window)
+
+;; vim O o 
+(defun start-newline-next ()
+  (interactive)
+  (end-of-line)
+  (newline-and-indent))
+
+(defun start-newline-prev ()
+  (interactive)
+  (forward-line -1)
+  (start-newline-next))
+
+(global-set-key (kbd "C-o") 'start-newline-next)
+(global-set-key (kbd "M-o") 'start-newline-prev)
+
+(c-set-style "ellemtel")
+(setq c-default-style "ellemtel" c-basic-offset 4)
+(setq tab-width 4 indent-tabs-mode nil)

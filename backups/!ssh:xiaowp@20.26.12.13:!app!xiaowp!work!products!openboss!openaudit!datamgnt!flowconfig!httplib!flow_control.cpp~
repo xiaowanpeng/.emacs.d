@@ -1,0 +1,77 @@
+#include "tool.h"
+#include "flow_template_mgr.h"
+
+
+int flowControl (
+    SOBSession* pSession,
+    const AISTD string& strIn,
+    const AISTD string& strOut,
+    CBSErrorMsg& cErrorMsg)
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter flowControl ok.");
+
+    CStringList result;
+    CDMCTool::split_string(strIn, "|", result);
+    if (result.size() != 3)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","strBuf is wrong format.");
+        cErrorMsg.set_errorMsg("控制字符串格式不正确。");
+        return -1;
+    }
+    
+    std::auto_ptr< CDmcextTemplateMgr<CFmTaskMonitorCfgList> > tFmTaskMonitorCfg = CDmcextAuditMgr::getFmTaskMonitorCfg(pSession);
+    CFmTaskMonitorCfg cFmTaskMonitorCfg;
+    CFmTaskMonitorCfgList listcFmTaskMonitorCfg;
+
+    if(tFmTaskMonitorCfg->selectFromTable(
+           cFmTaskMonitorCfg,
+           "",
+           listcFmTaskMonitorCfg,
+           cErrorMsg))
+    {
+        DMCEXT_ERROR_LOG("tFmTaskMonitorCfg->selectFromTable");
+    }
+
+    if (listcFmTaskMonitorCfg.size() != 1)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","listcFmTaskMonitorCfg size is not 1.");
+        return -1;
+    }
+
+    int sockfd;
+    struct sockaddr_in servaddr;
+
+    if( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel",AISTD string(AISTD string("create socket error: ") + strerror(errno)).c_str());
+        return -1;
+    }
+
+    memset(&servaddr, 0, sizeof(servaddr));
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_port = htons(listcFmTaskMonitorCfg[0].get_portNum());
+
+    if( inet_pton(AF_INET, listcFmTaskMonitorCfg[0].get_ipAddr().c_str(), &servaddr.sin_addr) <= 0)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call inet_pton error.");
+        return -1;
+    }
+
+    if( connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel",AISTD string(AISTD string("connect error: ") + strerror(errno)).c_str());
+        return -1;
+    }
+
+    if( send(sockfd, strBuf.c_str(), strBuf.length(), 0) < 0)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel",AISTD string(AISTD string("send msg error: ") + strerror(errno)).c_str());
+        return -1;
+    }
+
+    close(sockfd);
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave flowControl ok.");
+    return 0;
+}
+

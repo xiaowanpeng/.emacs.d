@@ -1,0 +1,320 @@
+# @(#)cshrc 1.11 89/11/29 SMI
+################################## 
+#	for stuff 
+################################## 
+
+#umask 022
+umask 002
+stty erase ^H
+set filec
+
+set prompt=$USER%
+set path=(/usr/kerberos/bin /usr/bin /bin) 
+
+if ($?prompt) then
+    set history=2000
+    stty erase ^H
+endif
+
+setenv EDITOR vim
+set path=(/usr/local/bin:$path)
+set path=(~xiaowp/ob_rel/bin:$path)
+setenv MANPATH /usr/share/man:/usr/share/local/man:/usr/openwin/man:$HOME/share/man
+
+setenv LD_LIBRARY_PATH /usr/share/Oratcl4.5:/usr/local/lib:/usr/lib:/usr/dt/lib
+setenv LIBPATH /usr/local/lib:/usr/lib:/usr/dt/lib
+setenv SHLIB_PATH /usr/local/lib:/usr/lib:/usr/dt/lib
+
+################################## 
+#	for AISW environment
+################################## 
+
+setenv USERNAME xiaowp
+setenv OB_SRC $HOME/work/products/openboss
+setenv OB_REL ~xiaowp/ob_rel
+setenv OB_RUN $HOME/ob_run
+#setenv MEMCACHED_HOME $HOME
+setenv MEMCACHED_HOME $OB_REL
+
+
+################################## 
+#	for Java compiler
+################################## 
+
+#setenv JAVA_HOME /usr/java5
+#setenv JAVA_HOME /usr/java/jdk1.6.0_26
+setenv JAVA_HOME /usr/java/jdk1.5.0_06
+setenv APACHE2_HOME $HOME/apache2
+set path=($JAVA_HOME/bin $APACHE2_HOME/bin $path /usr/local/bin /sw/bes65/bin $OB_REL/bin $OB_REL/svr $OB_REL/bin)
+setenv PRODUCT openboss
+################################## 
+#	for C++ compiler
+################################## 
+
+set path=($path /usr/vacpp/bin)
+setenv CC g++
+setenv PATH $OB_REL/bin:$PATH
+
+################################## 
+#	for Oracle
+################################## 
+
+#setenv ORACLE_BASE /home/oracle
+setenv ORACLE_BASE /u01/app/oracle
+#setenv ORACLE_HOME $ORACLE_BASE/product/10.2.0/db_2
+setenv ORACLE_HOME $ORACLE_BASE/product/11.2.0/dbhome_1
+setenv ADMIN_HOME $ORACLE_HOME/network/admin
+
+setenv LD_LIBRARY_PATH $ORACLE_HOME/lib:$LD_LIBRARY_PATH
+setenv LIBPATH $ORACLE_HOME/lib:$LIBPATH
+setenv SHLIB_PATH $ORACLE_HOME/lib:$SHLIB_PATH
+
+setenv NLS_LANG	AMERICAN_AMERICA.ZHS16GBK
+set path=($ORACLE_HOME/bin $path)
+
+################################## 
+#	for VisiBroker
+################################## 
+
+setenv VBROKERDIR /sw/bes65
+setenv PATH $VBROKERDIR/bin:$PATH
+setenv BES_LIC_DIR $VBROKERDIR/var
+setenv BES_LIC_DEFAULT_DIR $VBROKERDIR/license
+
+setenv VBROKER_ADM $VBROKERDIR/var/servers/ibmsvr2/adm
+setenv OSAGENT_PORT 28000
+#setenv OSAGENT_ADDR 10.10.10.182
+setenv OSAGENT_ADDR 10.3.3.240
+
+setenv LD_LIBRARY_PATH $VBROKERDIR/lib:$LD_LIBRARY_PATH
+setenv LIBPATH $VBROKERDIR/lib:$LIBPATH
+setenv SHLIB_PATH $VBROKERDIR/lib:$SHLIB_PATH
+
+setenv LDR_CNTRL USERREGS
+
+################################## 
+#	for VisiNotify
+################################## 
+
+#setenv VNDIR /sw/bes70
+
+#setenv PATH $VNDIR/bin:$PATH
+#setenv LD_LIBRARY_PATH $VNDIR/lib:$LD_LIBRARY_PATH
+#setenv LIBPATH $VNDIR/lib:$LIBPATH
+#setenv SHLIB_PATH $VNDIR/lib:$SHLIB_PATH
+
+################################## 
+#	for Tuxedo
+################################## 
+
+setenv WSNADDR //10.3.3.244:6001
+setenv OBSOCKET_ADDR 10.3.3.240
+setenv OBSOCKET_PORT 8536
+#setenv TOBJADDR //10.3.3.242:7777
+#setenv TUXCONFIG /home/ngcrm_c/config/TUXCONFIG
+#setenv TUXDIR /home/xiaowp/ob_rel/bea/tuxedo10.0
+setenv TUXDIR /home/xiaowp/ob_rel/bea/oracle/tuxedo11gR1
+
+set path=($TUXDIR/bin $path)
+
+setenv NLSPATH $TUXDIR/locale/C
+setenv LD_LIBRARY_PATH $TUXDIR/lib:$LD_LIBRARY_PATH
+setenv LIBPATH $TUXDIR/lib:$LIBPATH
+setenv SHLIB_PATH $TUXDIR/lib:$SHLIB_PATH
+
+setenv LD_LIBRARY_PATH $TUXDIR/lib:$LD_LIBRARY_PATH
+setenv LIBPATH $TUXDIR/lib:$LIBPATH
+setenv SHLIB_PATH $TUXDIR/lib:$SHLIB_PATH
+setenv TMTRACE on
+
+##################################
+# for LC... variable
+##################################
+
+#modification from C--->zh_CN: for Chinese support of SVN. L.L.L 2009/05/22
+#setenv LC__FASTMSG  true
+
+#setenv LANG en_US.UTF-8
+#setenv LC_COLLATE zh_CN
+#setenv LC_CTYPE zh_CN
+#setenv LC_MONETARY zh_CN
+#setenv LC_NUMERIC zh_CN
+#setenv LC_TIME zh_CN
+#setenv LC_MESSAGES zh_CN
+setenv LC_ALL zh_CN.GB18030
+
+
+######################################################
+# for VisNotify/MQ   20100530  add
+# 根据各个环境etc/openboss.def MESSAGE_TYPE是visnotify/mq进行配置
+# 一般只需要配置一种异步消息软件
+######################################################
+
+#IBM 广州开发 182 
+#setenv VNDIR /sw/bes70
+
+#setenv PATH $VNDIR/bin:$PATH
+#setenv LD_LIBRARY_PATH $VNDIR/lib:$LD_LIBRARY_PATH
+#setenv LIBPATH $VNDIR/lib:$LIBPATH
+#setenv SHLIB_PATH $VNDIR/lib:$SHLIB_PATH
+
+#异步消息debug模式，现场不要配置
+#setenv MESSAGE_DEBUG  1
+
+setenv LD_LIBRARY_PATH $APACHE2_HOME/lib:$LD_LIBRARY_PATH
+setenv LIBPATH $APACHE2_HOME/lib:$LIBPATH
+setenv SHLIB_PATH $APACHE2_HOME/lib:$SHLIB_PATH
+
+#共享内存需要使用的环境变量
+setenv EXTSHM ON
+
+setenv OBB_DISABLE_LOG_VERSION_INFO 0
+
+################################## 
+#       for other lib path environment
+################################## 
+
+setenv LD_LIBRARY_PATH ~xiaowp/ob_rel/lib:$LD_LIBRARY_PATH
+setenv LIBPATH ~xiaowp/ob_rel/lib:$LIBPATH
+setenv SHLIB_PATH ~xiaowp/ob_rel/lib:$SHLIB_PATH
+
+setenv LD_LIBRARY_PATH ~xiaowp/ob_rel/lib_acct:$LD_LIBRARY_PATH
+setenv LIBPATH ~xiaowp/ob_rel/lib_acct:$LIBPATH
+setenv SHLIB_PATH ~xiaowp/ob_rel/lib_acct:$SHLIB_PATH
+
+setenv LD_LIBRARY_PATH ~xiaowp/ob_rel/lib_cboss:$LD_LIBRARY_PATH
+setenv LIBPATH ~xiaowp/ob_rel/lib_cboss:$LIBPATH
+setenv SHLIB_PATH ~xiaowp/ob_rel/lib_cboss:$SHLIB_PATH
+
+setenv LD_LIBRARY_PATH ~xiaowp/ob_rel/lib_chnl:$LD_LIBRARY_PATH
+setenv LIBPATH ~xiaowp/ob_rel/lib_chnl:$LIBPATH
+setenv SHLIB_PATH ~xiaowp/ob_rel/lib_chnl:$SHLIB_PATH
+
+#setenv LD_LIBRARY_PATH ~xiaowp/ob_rel/lib_orl:$LD_LIBRARY_PATH
+#setenv LIBPATH ~xiaowp/ob_rel/lib_orl:$LIBPATH
+#setenv SHLIB_PATH ~xiaowp/ob_rel/lib_orl:$SHLIB_PATH
+
+setenv LD_LIBRARY_PATH ~xiaowp/ob_rel/lib_prm:$LD_LIBRARY_PATH
+setenv LIBPATH ~xiaowp/ob_rel/lib_prm:$LIBPATH
+setenv SHLIB_PATH ~xiaowp/ob_rel/lib_prm:$SHLIB_PATH
+
+setenv LD_LIBRARY_PATH ~xiaowp/ob_rel/lib_res:$LD_LIBRARY_PATH
+setenv LIBPATH ~xiaowp/ob_rel/lib_res:$LIBPATH
+setenv SHLIB_PATH ~xiaowp/ob_rel/lib_res:$SHLIB_PATH
+
+setenv LD_LIBRARY_PATH ~xiaowp/ob_rel/lib_ufi:$LD_LIBRARY_PATH
+setenv LIBPATH ~xiaowp/ob_rel/lib_ufi:$LIBPATH
+setenv SHLIB_PATH ~xiaowp/ob_rel/lib_ufi:$SHLIB_PATH
+
+setenv LD_LIBRARY_PATH ~xiaowp/ob_rel/lib_xg:$LD_LIBRARY_PATH
+setenv LIBPATH ~xiaowp/ob_rel/lib_xg:$LIBPATH
+setenv SHLIB_PATH ~xiaowp/ob_rel/lib_xg:$SHLIB_PATH
+
+setenv LD_LIBRARY_PATH ~xiaowp/ob_rel/lib_orl:$LD_LIBRARY_PATH
+setenv LIBPATH ~xiaowp/ob_rel/lib_orl:$LIBPATH
+setenv SHLIB_PATH ~xiaowp/ob_rel/lib_orl:$SHLIB_PATH
+
+################################## 
+#       for ngaudit lib path environment
+################################## 
+
+setenv LD_LIBRARY_PATH $OB_REL/lib:$LD_LIBRARY_PATH
+setenv LIBPATH $OB_REL/lib:$LIBPATH
+setenv SHLIB_PATH $OB_REL/lib:$LIBPATH
+
+setenv LD_LIBRARY_PATH $OB_RUN/lib:$LD_LIBRARY_PATH
+setenv LIBPATH $OB_RUN/lib:$LIBPATH
+setenv SHLIB_PATH $OB_RUN/lib:$SHLIB_PATH
+#setenv LD_PRELOAD "/usr/share/Oratcl4.5/libOratcl4.5.so"
+
+##################################
+#	for developer test lib
+##################################
+
+setenv LD_LIBRARY_PATH .:$HOME/lib:$LD_LIBRARY_PATH
+setenv LIBPATH .:$HOME/lib:$LIBPATH
+setenv SHLIB_PATH .:$HOME/lib:$SHLIB_PATH
+
+setenv PATH $MEMCACHED_HOME/bin:$PATH
+setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/home/ngaudit/lib/
+setenv LIBPATH ${LIBPATH}:/home/ngaudit/lib/
+setenv SHLIB_PATH ${SHLIB_PATH}:/home/ngaudit/lib/
+
+##################################
+#      android 
+##################################
+setenv APK_KEY_STORE_PATH /home/xiaowp/ob_rel/android/smart_terminal/doc
+setenv Plugin2Module.Properties /home/xiaowp/ob_rel/android/smart_terminal/crm4appModule/Plugin2Module.Properties
+setenv APK_UPDATE_URL http://10.3.3.240:8536/apk_release
+setenv JAVA_HOME /usr/java/jdk1.6.0_45
+setenv ANT_HOME $HOME/android/apache-ant-1.9.2
+setenv ANDROID_SDK_HOME $HOME/android/adt-bundle-linux-x86-20131030/sdk
+setenv PATH ${JAVA_HOME}/bin:${PATH}:$ANDROID_SDK_HOME/tools:$ANT_HOME/bin
+setenv APK_INSTALL $HOME/android/tomcat/webapps/apk_release
+setenv ANDROID_SRC $HOME/android/smart_terminal
+
+setenv BASH_PATH $PATH
+##################################
+#       for aliases
+##################################
+
+alias h history
+alias ls ls -F
+alias ll ls -l
+#alias sc source ~/.cshrc
+alias vi vim
+
+alias cdsrc cd $OB_SRC
+alias cdrel cd $OB_REL
+alias cdrun cd $OB_RUN
+alias cdjh cd /app/xiaowp/work/products/openboss/openaudit/aijh
+unlimit
+
+clear
+echo "****************************************************"
+echo "*           WELCOME to AIOpenCRM                   *"
+echo "****************************************************"
+echo "* 常用的环境变量:                                  *"
+echo "****************************************************"
+echo "  1. OB_SRC :          [$OB_SRC] "
+echo "  2. OB_REL :          [$OB_REL] "
+echo "  3. OB_RUN :          [$OB_RUN] "
+echo "  4. WSNADDR :         [$WSNADDR]"
+#echo "  5. TOBJADDR :        [$TOBJADDR] "
+echo "  6. LD_LIBRARY_PATH : [$LD_LIBRARY_PATH] "
+echo "****************************************************"
+echo "* 常用的命令集：                                   *"
+echo "****************************************************"
+echo "  1. qlog : 前台测试的后台日志查询命令              "
+echo "  2. menu : 前台测试的后台命令菜单集                "
+echo "  3. initcode : 根据OBD生成基础代码                 "
+echo "****************************************************"
+echo "* gmake 安装参数说明:                              *"
+echo "****************************************************"
+echo "  1. gmake install_sys "
+echo "     用途: 将动态库和服务安装到公共环境 "
+echo "     将动态库安装到:   [$OB_REL/lib] "
+echo "     将服务安装到:     [$OB_REL/svr] "
+echo "  2. gmake install_user"
+echo "     用途: 将动态库和服务安装到自测环境 "
+echo "     将动态库安装到:   [$HOME/lib] "
+echo "     将服务安装到:     [$HOME/svr] "
+echo "  3. gmake install "
+echo "     执行 gmake install_user 和 gmake install_sys "
+echo "     搜索路径:   [$HOME/lib] 优先于 [$OB_REL/lib] "
+echo "                 [$HOME/svr] 优先于 [$OB_REL/svr] "
+echo "  4. gmake install_headers_sys "
+echo "     用途: 将头文件安装到公共环境 "
+echo "     将头文件安装到:   [$OB_REL/include] "
+echo "  5. gmake install_headers_user"
+echo "     用途: 将头文件安装到自测环境 "
+echo "     将头文件安装到:   [$HOME/include] "
+echo "  6. gmake install_headers "
+echo "     执行 gmake install_headers_user 和 gmake install_headers_sys "
+echo "     搜索路径:   [$HOME/include] 优先于 [$OB_REL/include] "
+echo "****************************************************"
+echo "Hello, Welcome to linux development environment!    "
+echo "  openaudit: new audit project 2014"
+echo "  opendmc  : old audit project 2012"
+echo "****************************************************"
+

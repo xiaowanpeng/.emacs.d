@@ -1,0 +1,2 @@
+SUBDIRS=kernel mgr app svr mgr_ext monitor
+include $(OB_REL)/etc/Mastermake

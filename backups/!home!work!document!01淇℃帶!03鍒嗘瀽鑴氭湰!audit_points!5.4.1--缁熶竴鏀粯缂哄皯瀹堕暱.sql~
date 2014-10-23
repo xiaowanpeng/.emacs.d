@@ -1,0 +1,18 @@
+shell script
+06.03boss_user_rule.sh
+
+sql script
+07.01boss_business_rule_check.sql
+
+
+insert into data_diff_boss_business_rule(user_id,cnt,table_name,check_name)
+select/*+parallel(a,5)*/ a.user_id_a,1,'boss_users_rela','统一支付缺少家长' from 
+aicbs.boss_users_rela a where a.user_rela_type = 16 
+and a.valid_date<sysdate and a.expire_date>sysdate and not exists 
+(select/*+parallel(b,5)*/  b.user_id_b from  aicbs.boss_users_rela b where b.user_rela_type in (9,10) 
+and b.valid_date<sysdate and b.expire_date>sysdate and a.user_id_a=b.user_id_a and a.user_id_b=b.user_id_b)
+and not exists 
+(select/*+parallel(c,5)*/  c.user_id_b from  aicbs.boss_users_rela c 
+where c.user_rela_type=16 
+and c.valid_date<sysdate and c.expire_date>sysdate and a.user_id_a=c.user_id_b)
+and a.user_id_a>0;

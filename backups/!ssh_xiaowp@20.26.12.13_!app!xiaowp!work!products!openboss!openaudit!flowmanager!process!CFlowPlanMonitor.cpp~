@@ -1,0 +1,491 @@
+#include "base_func.h"
+
+#include "thread_value.h"
+#include "openbroker/OBClient.h"
+#include "openbroker/svr_ctrl.h"
+#include "ob_session.h"
+#include "ob_kernel.h"
+#include "c_uni_socket.h"
+#include "tool.h"
+#include "socket_pool.h"
+#include "tinyxml.h"
+
+#include "FmTaskOp.h"
+
+#include "CFlowPlanMonitor.h"
+#include "tmppublic.h"
+
+
+CFlowPlanMonitor::CFlowPlanMonitor()
+{
+}
+
+CFlowPlanMonitor::~CFlowPlanMonitor()
+{
+}
+
+int CFlowPlanMonitor::run (SOBSession* pSession)
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter CFlowPlanMonitor::run ok.");
+    CBSErrorMsg cErrorMsg;
+
+    while (1)
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","start polling plan");
+
+        CFmPlanList listFmPlan;
+        if (get_readyFmPlan (
+                pSession,
+                listFmPlan,
+                cErrorMsg))
+        {
+            LogAppend(DEBUG_LEVEL,"InfoLevel","call get_readyFmPlan error.");
+            pSession->rollback_allDbConn();
+            continue;
+        }
+
+        if (create_fmTask (
+                 pSession,
+                 listFmPlan,
+                 cErrorMsg))
+        {
+            LogAppend(DEBUG_LEVEL,"InfoLevel","call create_fmTask error.");
+            pSession->rollback_allDbConn();
+            continue;
+        }
+
+        LogAppend(DEBUG_LEVEL,"InfoLevel","end polling plan");
+
+        pSession->commit_allDbConn();
+        break;
+    }
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave CFlowPlanMonitor::run ok.");
+    return 0;
+}
+
+
+int CFlowPlanMonitor::get_readyFmPlan (
+    SOBSession* pSession,
+    CFmPlanList& listFmPlan,
+    CBSErrorMsg& cErrorMsg
+    )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter get_readyFmPlan ok.");
+    std::auto_ptr< CDmcextTemplateMgr<CFmPlanList> > tFmPlan = CDmcextAuditMgr::getFmPlan(pSession);
+    CFmPlan cFmPlan;
+
+    cFmPlan.set_isPause(0);
+    if(tFmPlan->selectFromTable(
+           cFmPlan,
+           " next_run_date <= sysdate and sysdate between valid_date and expire_date ",
+           listFmPlan,
+           cErrorMsg))
+    {
+        DMCEXT_ERROR_LOG("tFmPlan->selectFromTable");
+    }
+
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave get_readyFmPlan ok.");
+    return 0;
+}
+
+
+int CFlowPlanMonitor::plan2Task (
+    SOBSession* pSession,
+    const CFmPlan& cFmPlan,
+    CFmTaskList& listFmTask,    
+    CBSErrorMsg& cErrorMsg )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter plan2task ok.");
+
+    
+    int64 llSeq;
+    if (get_sequence (
+            pSession,
+            "seq_fm_sequence",
+            llSeq,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call get_sequence error.");
+        return OBD_FAIL;
+    }
+
+    CBSDateTime dtmCur;
+    if (get_databaseTime((*pSession->get_dbConn()),
+                         dtmCur, 
+                         cErrorMsg))
+    {
+        cErrorMsg.set_hint("获取系统时间失败!");
+        return OBD_FAIL;
+    }
+
+    CFmTask cFmTask;
+    cFmTask.set_taskId(llSeq);
+    cFmTask.set_taskName(cFmPlan.get_planName());
+//    cFmTask.set_subtaskId(lstRow[0][2].get_asInt64());
+//    cFmTask.set_extTaskId(lstRow[0][3].get_asInt64());
+    cFmTask.set_planId(cFmPlan.get_planId());
+    cFmTask.set_flowId(cFmPlan.get_flowId());
+    cFmTask.set_taskDate(dtmCur);
+//    cFmTask.set_beginDate(lstRow[0][7].get_asDatetime());
+//    cFmTask.set_endDate(lstRow[0][8].get_asDatetime());
+    cFmTask.set_sts(0);
+//    cFmTask.set_runMsg();
+    cFmTask.set_regionCode("0");
+//    cFmTask.set_busiId(lstRow[0][12].get_asInt32());
+//    cFmTask.set_xml(strXmlParam);
+
+    if (FmTaskOp::insert_fmTask (
+            pSession,
+            cFmTask,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call FmTaskOp::insert_fmTask main task error.");
+        return OBD_FAIL;
+    }
+
+    if (get_sequence (
+            pSession,
+            "seq_fm_sequence",
+            llSeq,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call get_sequence error.");
+        return OBD_FAIL;
+    }
+
+    cFmTask.set_subtaskId(llSeq);
+
+    AISTD string strXmlParam;
+    if (task2XmlParam (
+             pSession,
+             cFmTask,
+             strXmlParam,
+             cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call task2XmlParam error.");
+        return OBD_FAIL;
+    }
+
+    cFmTask.set_xml(strXmlParam);
+    
+    if (FmTaskOp::insert_fmTask (
+            pSession,
+            cFmTask,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call insert_fmTask sub task error.");
+        return OBD_FAIL;
+    }
+
+    listFmTask.push_back(cFmTask);
+
+    CFmPlan cFmPlanOld;
+    cFmPlanOld.set_planId(cFmPlan.get_planId());
+
+    CBSDateTime dtmNextDate;
+    if (get_cycleNextDate (
+            pSession,
+            cFmPlan.get_cycleType(),
+            cFmPlan.get_cycleParam(),
+            cFmPlan.get_nextRunDate(),
+            dtmNextDate,
+            cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call get_cycleNextDate error.");
+        return OBD_FAIL;
+    }
+
+    
+    CFmPlan cFmPlanNew;
+    cFmPlanNew.set_nextRunDate(dtmNextDate);
+    cFmPlanNew.set_runNums(cFmPlan.get_runNums() + 1);
+    if (!cFmPlan.get_firstTaskTime().isValid())
+    {
+        cFmPlanNew.set_firstTaskTime(dtmCur);
+    }
+    cFmPlanNew.set_lastTaskTime(dtmCur);
+
+    std::auto_ptr< CDmcextTemplateMgr<CFmPlanList> > tFmPlan = CDmcextAuditMgr::getFmPlan(pSession);
+    if(tFmPlan->updateToTable(
+           cFmPlanOld,
+           cFmPlanNew,
+           "",
+           cErrorMsg))
+    {
+        DMCEXT_ERROR_LOG("tFmPlan->updateToTable");
+    }
+
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave plan2task ok.");
+    return 0;
+}
+
+
+int CFlowPlanMonitor::create_fmTask (
+    SOBSession* pSession,
+    const CFmPlanList& listFmPlan,
+    CBSErrorMsg& cErrorMsg )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter create_fmTask ok.");
+
+    if (listFmPlan.empty())
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","plan list is empty.");
+        return 0;
+    }
+
+    CFmTaskList listFmTask;
+    CFmPlanList::const_iterator itr;
+    for (itr = listFmPlan.begin(); itr != listFmPlan.end(); itr++)
+    {
+        listFmTask.clear();
+        
+        if (plan2Task (
+                pSession,
+                *itr,
+                listFmTask,
+                cErrorMsg))
+        {
+            LogAppend(DEBUG_LEVEL,
+                      "InfoLevel",
+                      AISTD string("call plan2Task error. plan id : " + itoa(itr->get_planId())).c_str());
+        }
+
+        if (plan2NodeInfo (
+                pSession,
+                *itr,
+                listFmTask,
+                cErrorMsg))
+        {
+            LogAppend(DEBUG_LEVEL,
+                      "InfoLevel",
+                      AISTD string("call plan2NodeInfo error. plan id : " + itoa(itr->get_planId())).c_str());
+        }
+        
+    }
+
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave create_fmTask ok.");
+    return 0;
+}
+
+int CFlowPlanMonitor::plan2NodeInfo (
+    SOBSession* pSession,
+    const CFmPlan& cFmPlan,
+    const CFmTaskList& listFmTask,
+    CBSErrorMsg& cErrorMsg )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter plan2Nodeinfo ok.");
+
+    std::auto_ptr< CDmcextTemplateMgr<CFmFlowNodeInfoList> > tFmFlowNodeInfo = CDmcextAuditMgr::getFmFlowNodeInfo(pSession);
+    CFmFlowNodeInfo cFmFlowNodeInfo;
+    CFmFlowNodeInfoList listcFmFlowNodeInfo;
+
+    cFmFlowNodeInfo.set_flowId(cFmPlan.get_flowId());
+    cFmFlowNodeInfo.set_releaseStatus(cFmPlan.get_releaseStatus());
+
+    // 找到流程中的所有节点
+    if(tFmFlowNodeInfo->selectFromTable(
+           cFmFlowNodeInfo,
+           "sysdate between valid_date and expire_date",
+           listcFmFlowNodeInfo,
+           cErrorMsg))
+    {
+        DMCEXT_ERROR_LOG("tFmFlowNodeInfo->selectFromTable");
+    }
+
+    if (listcFmFlowNodeInfo.empty())
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel",AISTD string("flow has no node info, flow_id: " + itoa(cFmPlan.get_flowId())).c_str());
+        return -1;
+    }
+
+    std::auto_ptr< CDmcextTemplateMgr<CFmFlowNodeRelationList> > tFmFlowNodeRelation = CDmcextAuditMgr::getFmFlowNodeRelation(pSession);
+    CFmFlowNodeRelation cFmFlowNodeRelation;
+    CFmFlowNodeRelationList listcFmFlowNodeRelation;
+    cFmFlowNodeRelation.set_flowId(cFmPlan.get_flowId());
+    cFmFlowNodeRelation.set_releaseStatus(cFmPlan.get_releaseStatus());
+
+    //对任务节点信息做初始化
+    CFmTaskNodeInfo fmTaskNodeInfo;
+    fmTaskNodeInfo.set_planId(cFmPlan.get_planId());
+    fmTaskNodeInfo.set_sts(0);
+    fmTaskNodeInfo.set_parentInstIdSuccnum(0);
+    
+    CFmFlowNodeInfoList::iterator itr;
+    CFmTaskList::const_iterator itrTask;
+
+    CFmTaskNodeInfoList listTaskNodeInfo;
+    
+    // 对每个节点生成一个任务节点信息
+    for (itr = listcFmFlowNodeInfo.begin(); itr != listcFmFlowNodeInfo.end(); itr ++)
+    {
+        listcFmFlowNodeRelation.clear();
+        cFmFlowNodeRelation.set_childInstId(itr->get_instId());
+        if(tFmFlowNodeRelation->selectFromTable(
+               cFmFlowNodeRelation,
+               "sysdate between valid_date and expire_date",
+               listcFmFlowNodeRelation,
+               cErrorMsg))
+        {
+            DMCEXT_ERROR_LOG("tFmFlowNodeRelation->selectFromTable");
+        }
+
+        fmTaskNodeInfo.set_instId(itr->get_instId());
+        fmTaskNodeInfo.set_parentInstId(listcFmFlowNodeRelation.size());
+        fmTaskNodeInfo.set_nodeType(itr->get_nodeType());
+
+        // 对每个子任务生成一个节点信息
+        for (itrTask = listFmTask.begin(); itrTask != listFmTask.end(); itrTask ++)
+        {
+            fmTaskNodeInfo.set_taskId(itrTask->get_taskId());
+            fmTaskNodeInfo.set_subtaskId(itrTask->get_subtaskId());
+
+            listTaskNodeInfo.push_back(fmTaskNodeInfo);
+        }
+    }
+
+    std::auto_ptr< CDmcextTemplateMgr<CFmTaskNodeInfoList> > tFmTaskNodeInfo = CDmcextAuditMgr::getFmTaskNodeInfo(pSession);
+    
+    if(tFmTaskNodeInfo->insertIntoTable(
+           listTaskNodeInfo,
+           cErrorMsg))
+    {
+        DMCEXT_ERROR_LOG("tFmTaskNodeInfo->insertInfoTable");
+    }
+
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave plan2Nodeinfo ok.");
+    return 0;
+}
+
+int CFlowPlanMonitor::task2XmlParam (
+    SOBSession* pSession,
+    const CFmTask& cFmTask,
+    AISTD string& strXmlParam,
+    CBSErrorMsg& cErrorMsg )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter CFlowPlanMonitor::task2XmlParam ok.");
+
+    std::auto_ptr< CDmcextTemplateMgr<CFmPlanParamList> > tFmPlanParam = CDmcextAuditMgr::getFmPlanParam(pSession);
+    CFmPlanParam cFmPlanParam;
+    CFmPlanParamList listcFmPlanParam;
+
+    cFmPlanParam.set_planId(cFmTask.get_planId());
+    cFmPlanParam.set_flowId(cFmTask.get_flowId());
+
+    if(tFmPlanParam->selectFromTable(
+           cFmPlanParam,
+           "sysdate between valid_date and expire_date",
+           listcFmPlanParam,
+           cErrorMsg))
+    {
+        DMCEXT_ERROR_LOG("tFmPlanParam->selectFromTable");
+    }
+
+    TiXmlDeclaration * xmlDec = new TiXmlDeclaration("1.0", "UTF-8", "yes");
+    TiXmlDocument * xmlDocs = new TiXmlDocument();
+    xmlDocs->LinkEndChild(xmlDec);
+    TiXmlElement * paraElmt = new TiXmlElement("Parameter");
+    xmlDocs->LinkEndChild(paraElmt);
+    
+    
+    CFmPlanParamList::iterator itr;
+    for (itr = listcFmPlanParam.begin(); itr != listcFmPlanParam.end(); itr ++)
+    {
+        if (addSingleParam (
+                cFmTask,
+                *itr,
+                paraElmt))
+        {
+            LogAppend(DEBUG_LEVEL,"InfoLevel","call addSingleParam error.");
+            return OBD_FAIL;
+        }
+    }
+
+    TiXmlPrinter printer;
+    xmlDocs->Accept(&printer);
+    strXmlParam = printer.CStr();
+
+    delete xmlDocs;
+
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave CFlowPlanMonitor::task2XmlParam ok.");
+    return 0;
+}
+
+int CFlowPlanMonitor::addSingleParam (
+    const CFmTask& cFmTask,
+    const CFmPlanParam& cFmPlanParam,
+    TiXmlElement* paraElmt)
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter CFlowPlanMonitor::addSingleParam ok.");
+
+    AISTD string strName;
+    if (cFmPlanParam.get_instId() == 1)
+    {
+        strName = "Common";
+    }
+    else
+    {
+        strName =
+            AISTD string("Node")
+            + AISTD string(itoa(cFmPlanParam.get_instId()));
+    }
+
+    TiXmlElement* pEle = NULL;
+    for (pEle = paraElmt->FirstChildElement();
+         pEle;
+         pEle = pEle->NextSiblingElement())
+    {
+        if (strName == pEle->Value())
+        {
+            break;
+        }
+    }
+
+    if (!pEle)
+    {
+        pEle = new TiXmlElement(strName.c_str());
+        paraElmt->LinkEndChild(pEle);
+    }
+
+    TiXmlElement* pNewEle = new TiXmlElement(cFmPlanParam.get_paraSymbol().c_str());
+    int nLinkInstId = cFmPlanParam.get_linkInstId();
+    pNewEle->SetAttribute("paraLink", nLinkInstId);
+
+    pEle->LinkEndChild(pNewEle);
+    
+    AISTD string strText;
+    if (0 == nLinkInstId)
+    {
+        if ("$SUBTASK_ID$" == cFmPlanParam.get_paraValue())
+        {
+            strText = itoa(cFmTask.get_subtaskId());
+        }
+        else
+        {
+            strText = cFmPlanParam.get_paraValue();
+        }
+    }
+    else if (1 == nLinkInstId)
+    {
+        strText =
+            AISTD string("Parameter/Common/")
+            + cFmPlanParam.get_linkPara();
+    }
+    else
+    {
+        strText =
+            AISTD string("Parameter/Node")
+            + AISTD string(itoa(nLinkInstId))
+            + AISTD string("/")
+            + cFmPlanParam.get_linkPara();
+    }
+
+    TiXmlText* tiText = new TiXmlText(strText.c_str());
+    pNewEle->LinkEndChild(tiText);
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave CFlowPlanMonitor::addSingleParam ok.");
+    return 0;
+}

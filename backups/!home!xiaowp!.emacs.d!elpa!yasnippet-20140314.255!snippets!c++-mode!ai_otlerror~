@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: ai_otlerror
+# key: otlerr
+# --
+AISTD string strErr = "error sql: ";
+strErr += p.stm_text;
+strErr += ";-----var_info: ";
+strErr += p.var_info;
+strErr += ";-----error msg: ";
+strErr += p.msg;
+
+LogAppend(DEBUG_LEVEL,"InfoLevel",strErr.c_str());
+cErrorMsg.set_errorMsg(strErr.c_str());
+
+return -1;

@@ -1,0 +1,314 @@
+
+
+int32 get_cycleNextDate
+(
+ SOBSession* pSession,
+ const int16& nCycleType,
+ const AISTD string& strCycleParam,
+ const CBSDateTime& dtmCurrDate,
+ CBSDateTime& dtmNextDate,
+ CBSErrorMsg& cErrorMsg
+)
+{
+#ifdef DEBUG
+	AISTD cout << "周期类型:" << nCycleType << AISTD endl;	
+	AISTD cout << "周期参数:" << strCycleParam << AISTD endl;	
+#endif
+	CBSDateTime dtmCur;
+  if (get_databaseTime((*pSession->get_dbConn()),
+                                  dtmCur, 
+              					          cErrorMsg))
+  {
+    cErrorMsg.set_hint("获取系统时间失败!");
+    return OBD_FAIL;
+  }
+	  
+	if (1==nCycleType || 0==nCycleType)//
+	{
+		//strCycleParam的格式:分钟;小时;日期;月份;星期
+		//其中分钟的取值范围0--59,必须在此范围内
+		//小时的取值范围0--23,必须在此范围内
+		//日期的取值范围0--31,可以用"*"代替,表示每天
+		//月份的取值范围1--12,可以用"*"代替,表示每月
+		//星期的取值范围0--6,可以用"*"代替,表示每天
+		
+		//取系统时间
+		AISTD string strCurSend,strCurMinute,strCurHour,strCurDay,strCurMonth,strCurYear,strCurWeek;
+		
+	  strCurSend=dtmCur.toString("%S");
+	  strCurMinute=dtmCur.toString("%N");
+	  strCurHour=dtmCur.toString("%H");
+	  strCurDay=dtmCur.toString("%D");
+	  strCurMonth=dtmCur.toString("%M");
+	  strCurYear=dtmCur.toString("%Y");
+	/*
+	  #ifdef DEBUG
+		AISTD cout << "当前分钟::" << strCurMinute  << AISTD endl;
+		AISTD cout << "当前小时::" << strCurHour  << AISTD endl;
+		AISTD cout << "当前日期::" << strCurDay  << AISTD endl;
+		AISTD cout << "当前月份::" << strCurMonth  << AISTD endl;
+		AISTD cout << "当前年份::" << strCurYear  << AISTD endl;
+		//AISTD cout << "当前星期::" << strWeek  << AISTD endl;
+		#endif
+	*/  
+		CStringList listTime;
+		CDMCTool::split_string(strCycleParam,";",listTime);
+		if (listTime.size()!=5)
+	 	{
+	 		cErrorMsg.set_errorMsg("输入的时间格式错误!");
+	 		return OBD_FAIL;
+	 	}	
+	 	
+		AISTD string strMinute,strHour,strDay,strMonth,strWeek;
+		strMinute=listTime[0];
+		strHour=listTime[1];
+		strDay=listTime[2];
+		strMonth=listTime[3];
+		strWeek=listTime[4];
+	/*
+		#ifdef DEBUG
+		AISTD cout << "分钟::" << strMinute  << AISTD endl;
+		AISTD cout << "小时::" << strHour  << AISTD endl;
+		AISTD cout << "日期::" << strDay  << AISTD endl;
+		AISTD cout << "月份::" << strMonth  << AISTD endl;
+		AISTD cout << "星期::" << strWeek  << AISTD endl;
+		#endif
+	*/	
+		if (atoi(strMinute.c_str())<0 || atoi(strMinute.c_str())>59)
+		{
+			cErrorMsg.set_errorMsg("分钟格式错误!");
+			return OBD_FAIL;
+		}	
+		if (atoi(strHour.c_str())<0 || atoi(strHour.c_str())>23)
+		{
+			cErrorMsg.set_errorMsg("小时格式错误!");
+			return OBD_FAIL;
+		}
+		if (strWeek!="*")
+		{
+			cErrorMsg.set_errorMsg("星期格式错误!");
+			return OBD_FAIL;
+		}
+		
+		//解析全部日期字段
+		CStringList listTmp;
+		CStringList listDay,listDayTmp;
+		if (strDay=="*")
+		{	
+			for (int32 i=1;i<(dtmCur.daysInMonth()+1);i++)
+				listDay.push_back(itoa(i));
+		}
+		else
+		{
+			CDMCTool::split_string(strDay,",",listDayTmp);
+		
+			//支持1-3这种模式
+			CStringList::iterator ptr=listDayTmp.begin();
+			for (;ptr!=listDayTmp.end();ptr++)
+			{
+				listTmp.clear();
+				if ((*ptr).length()>2)
+				{
+					CDMCTool::split_string((*ptr),"-",listTmp);
+					if (listTmp.size()!=2)
+					{
+						cErrorMsg.set_errorMsg("日期分隔符格式错误!");
+						return OBD_FAIL;
+					}	
+					
+					int32 iFirst=atoi(listTmp[0].c_str());
+					int32 iLast=atoi(listTmp[1].c_str());
+					for (int32 i=iFirst;i<iLast+1;i++)
+						listDay.push_back(itoa(i));
+				}
+				else
+				{
+					listDay.push_back((*ptr));
+				}	
+			}
+		}
+		//解析全部月份字段
+		CStringList listMonth,listMonthTmp;
+		if (strMonth=="*")
+		{
+			for (int32 i=1;i<13;i++)
+				listMonth.push_back(itoa(i));   
+		}	
+		else
+		{
+			CDMCTool::split_string(strMonth,",",listMonthTmp);
+			
+			//支持1-3这种模式
+			CStringList::iterator itr=listMonthTmp.begin();
+			for (;itr!=listMonthTmp.end();itr++)
+			{
+				listTmp.clear();
+				if ((*itr).length()>2)
+				{	
+					CDMCTool::split_string((*itr),"-",listTmp);
+				
+					if (listTmp.size()!=2)
+					{
+						cErrorMsg.set_errorMsg("月份分隔符格式错误!");
+						return OBD_FAIL;
+					}	
+				
+					int32 iFirst=atoi(listTmp[0].c_str());
+					int32 iLast=atoi(listTmp[1].c_str());
+					for (int32 i=iFirst;i<iLast+1;i++)
+						listMonth.push_back(itoa(i));
+				}		
+				else
+				{
+					listMonth.push_back((*itr));
+				}	
+			}
+		}
+		//排序
+		AISTD sort(listDay.begin(),listDay.end(),lessComp);
+		AISTD sort(listMonth.begin(),listMonth.end(),lessComp);
+		
+		#ifdef DEBUG
+			for (int32 i=0;i<listDay.size();i++)
+				AISTD cout << "排序后具体日期::" << listDay[i] << AISTD endl;
+			for (int32 i=0;i<listMonth.size();i++)
+				AISTD cout << "排序后具体月份::" << listMonth[i] << AISTD endl;
+		#endif
+		
+		bool bNextDay=false,bNextMonth=false,bNextYear=false;
+		AISTD string strNextMinute,strNextHour,strNextDay,strNextMonth,strNextYear;
+		
+		//小时和分钟,秒默认00
+		AISTD string strCurHHMISS=strCurHour+strCurMinute+strCurSend;
+		AISTD string strHHMISS=strHour+strMinute+"00";
+#ifdef DEBUG
+		AISTD cout << "strHour >> " << strHour << AISTD endl;
+		AISTD cout << "strMinute >> " << strMinute << AISTD endl;
+		AISTD cout << "strCurHHMISS >> " << strCurHHMISS << AISTD endl;
+		AISTD cout << "strHHMISS >> " << strHHMISS << AISTD endl;
+#endif
+		strNextMinute=strMinute;
+		strNextHour=strHour;
+		if (atoi(strCurHHMISS.c_str())>=atoi(strHHMISS.c_str()))
+			bNextDay=true;
+				
+		//日期
+		for (int32 i=0;i<listDay.size();i++)
+		{
+			if (atoi(strCurDay.c_str())==atoi(listDay[i].c_str()))
+			{
+				if (bNextDay)	
+				{	
+					if (i<listDay.size()-1)
+						strNextDay=listDay[i+1];
+					else
+					{
+						strNextDay=listDay[0];
+						bNextMonth=true;
+						LogAppend(INFO_LEVEL, "DebugInfo","下个月");
+					}	
+				}
+				else strNextDay=listDay[i];
+				break;
+			}	
+			else if(atoi(strCurDay.c_str()) < atoi(listDay[i].c_str()))
+			{
+				strNextDay=listDay[i];
+				break;
+			}
+			else	
+			{
+				if (i==listDay.size()-1)
+				{	
+					strNextDay=listDay[0];
+					bNextMonth=true;
+					LogAppend(INFO_LEVEL, "DebugInfo","下个月");
+					break;
+				}
+				continue;
+			}	
+		}
+		
+		//月份
+		for (int32 i=0;i<listMonth.size();i++)
+		{
+			if (atoi(strCurMonth.c_str())==atoi(listMonth[i].c_str()))
+			{
+				if (bNextMonth)	
+				{	
+					if (i<listMonth.size()-1)
+						strNextMonth=listMonth[i+1];
+					else
+					{
+						strNextMonth=listMonth[0];
+						bNextYear=true;
+					}	
+				}
+				else strNextMonth=listMonth[i];
+				break;
+			}	
+			else if(atoi(strCurMonth.c_str())< atoi(listMonth[i].c_str()))
+			{
+				strNextMonth=listMonth[i];
+				strNextDay=listDay[0];// add 2011-7-13
+				break;
+		 }	
+		 else
+		 {		
+			if (i==listMonth.size()-1)
+			{	
+				strNextMonth=listMonth[0];
+				bNextYear=true;
+				break;
+			}
+			continue;
+		 }	
+		}
+			
+		if (bNextYear) strNextDay=listDay[0];// add 2011-7-13
+			
+		if (bNextYear) strNextYear=itoa(atoi(strCurYear.c_str())+1);
+		else strNextYear=strCurYear;
+		
+		//格式要求,如果不是两位,前面都需要补足0	
+		if (strNextMinute.length()<2) strNextMinute="0"+strNextMinute;
+		if (strNextHour.length()<2) strNextHour="0"+strNextHour;
+		if (strNextDay.length()<2) strNextDay="0"+strNextDay;
+		if (strNextMonth.length()<2) strNextMonth="0"+strNextMonth;
+				
+		AISTD string strNextDate=strNextYear+strNextMonth+strNextDay+strNextHour+strNextMinute+"00";
+		dtmNextDate=str_to_time(strNextDate);
+	}
+	else if (2==nCycleType)
+	{
+		dtmNextDate=dtmCurrDate;
+		int32 iAddMinutes=atoi(strCycleParam.c_str());
+		if (iAddMinutes<=0)
+		{
+			cErrorMsg.set_errorMsg("时间间隔不能为0分钟");
+			return OBD_FAIL;
+		}
+#ifdef DEBUG
+		AISTD cout << "当前执行时间:" << dtmCurrDate << AISTD endl;	
+		AISTD cout << "时间间隔:" << iAddMinutes << AISTD endl;	
+#endif
+		for (;dtmNextDate<=dtmCur;dtmNextDate=dtmNextDate.addSecs(iAddMinutes*60))
+		{
+#ifdef DEBUG
+			if (dtmNextDate!=dtmCurrDate)
+				LogAppend(INFO_LEVEL, "DebugInfo", ("跳过该时间间隔执行时间点:"+time_to_str(dtmNextDate,"%Y%M%D%H%N%S")).c_str());	
+#endif
+		}
+	}
+	else
+	{
+		cErrorMsg.set_errorMsg("不支持的周期参数类型");
+		return OBD_FAIL;
+	}
+	
+#ifdef DEBUG
+	AISTD cout << "下次执行时间:" << dtmNextDate << AISTD endl;	
+#endif
+
+	return OBD_OK;
+}

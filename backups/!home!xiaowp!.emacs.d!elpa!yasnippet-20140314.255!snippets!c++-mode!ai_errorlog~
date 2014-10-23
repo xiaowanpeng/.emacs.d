@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: ai_errorlog
+# key: errlog
+# --
+LogAppend(DEBUG_LEVEL, "InfoLevel", $1);
+cErrorMsg.set_errorMsg($1);

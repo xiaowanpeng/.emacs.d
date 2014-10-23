@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: func_template
+# key: func
+# --
+int $1 (
+    SOBSession* pSession,$0
+    CBSErrorMsg cErrorMsg )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter $1 ok.");
+
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave $1 ok.");
+}

@@ -1,0 +1,13 @@
+#include "ob_session.h"
+#include "tool.h"
+
+#include "gen_flow_task.h"
+
+
+int gen_flow_task
+        (SOBSession* pSession,
+         const int64& llSubtaskId,
+         const CAuditPlan& cAuditPlan,
+         CBSErrorMsg& cErrorMsg)
+{
+}

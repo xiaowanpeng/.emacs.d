@@ -1,0 +1,88 @@
+#######################################################
+#
+# 后台执行程序的 Makefile 模板
+# 说明：
+#     1.后台执行程序将安装到 $(OB_REL)/bin/
+#     2.可以定义测试程序，对后台执行程序进行自测
+#     3.可是使用宏 ADDTIONAL_INSTALL_CMD 定义在执行完目标拷贝后的操作
+#     4.同样，可以使用宏 ADDTIONAL_INSTALL_HEADER_CMD 定义在 cp 头文件后的操作
+#
+########################################################
+
+# 包含基本的系统参数定义【不能更改】
+include $(OB_REL)/etc/NGbasedefine.mk
+
+########################################################
+DATAMGNT_PUBLIC=../../public
+# 需要使用公共 SVR_CTRL
+NEED_SVR_CTRL   = 1
+
+# 目标名称，最终的程序文件名也是这个名称【必须修改】
+DEST =FlowPlanMonitor
+
+# 目标的类型，必须是 BIN【不能修改】
+DEST_TYPE = BIN
+
+# 编译目标程序需要的源代码文件，可以带路径（但必须是绝对路径）【必须修改】
+DEST_SOURCES=FlowPlanMonitor.cpp CFlowPlanMonitor.cpp
+
+# 当前目标程序调用的 OBD 名称【可选】
+# 这些 OBD 都是 $(OB_REL)/idl/ 下的文件，因此需要写子系统的名称
+CALLED_OBD =									\
+
+# 引用的宏定义文件,不需要后缀【默认为OpenBossApp.h】
+#USER_PROJECT_NAME = AuditMgnt
+
+# 目标的头文件安装路径，最终目录将是 $OB_REL/include/$(SUBSYSTEM)/$(HEADER_PATH)/ 【可选】
+# HEADER_PATH = sample_dir
+
+# 需要安装的头文件，文件名需带路径【可选】
+# HEADERS = ../include/sample.h $(OB_SRC)/$(SUBSYSTEM)/public/xx.h
+
+# 消息文件的名称【可选】
+# MESSAGE_FILE = sample.ems
+
+# 定义测试程序名称【可选】
+# TEST_PROGRAM = my_test
+
+# 定义测试程序的源代码文件【可选】
+# TEST_SOURCES = my_test.cpp
+
+########################################################
+
+# 用户的宏定义，为编译器添加其它的 -D 参数，注意不要自行添加 -D 【可选】
+#USER_DEFS =
+
+# 用户定义的 include 路径，即除了 public 外的其它 include 路径【可选】
+USER_INC_PATH = .									\
+		$(OB_REL)/include							\
+		$(OB_REL)/include/AI_ORL					\
+		$(OB_REL)/include/common					\
+		$(OB_REL)/include/obcommon					\
+		../kernel		\
+                ../mgr            \
+                ../include    \
+		$(DATAMGNT_PUBLIC)/tinyxml    \
+		$(DATAMGNT_PUBLIC)/toolfunc    \
+		$(DATAMGNT_PUBLIC)/socket    \
+
+
+
+
+# 引用的 OBD 路径 名称
+#OBD_INC_PATH =								
+
+# 非 $(OB_REL)/lib/ 下库文件的连接路径【可选】
+#USER_LD_PATH = ../kernel ../mgr
+
+# 需要连接的其它库文件，应使用 $(BUILDTYPE) 作为后缀【可选】
+# USER_LIBRARIES = sample$(BUILDTYPE)
+USER_LIBRARIES =flow_template_mgr$(BUILDTYPE) \
+		ob_thread$(BUILDTYPE)			\
+		ob_appbase$(BUILDTYPE)			\
+		DMCPublic$(BUILDTYPE)\
+
+########################################################
+
+# Makefile 规则文件【不能修改】
+include $(OB_REL)/etc/NGCmake_au

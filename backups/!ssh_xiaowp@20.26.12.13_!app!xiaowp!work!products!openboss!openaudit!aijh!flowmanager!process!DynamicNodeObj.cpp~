@@ -1,0 +1,76 @@
+#include <memory.h>
+#include <dlfcn.h>
+#include "base_func.h"
+
+#include "thread_value.h"
+#include "openbroker/OBClient.h"
+#include "openbroker/svr_ctrl.h"
+#include "ob_session.h"
+#include "ob_kernel.h"
+#include "tool.h"
+
+#include "DynamicNodeObj.h"
+
+
+DynamicNodeObj::DynamicNodeObj (
+    SOBSession* pSession,
+    const int64& llTaskId,
+    const int32& nInstId,
+    CBSErrorMsg& cErrorMsg )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter DynamicNodeObj::DynamicNodeObj ok.");
+
+    if (init_nodeObj (
+             pSession,
+             llTaskId,
+             nInstId,
+             cErrorMsg))
+    {
+        LogAppend(DEBUG_LEVEL,"InfoLevel","call init_nodeObj error.");
+        m_pNodeObj = NULL;
+        m_pDll = NULL;
+        m_pDeleteNodeObj = NULL;
+    }
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave DynamicNodeObj::DynamicNodeObj ok.");
+}
+
+DynamicNodeObj::~DynamicNodeObj()
+{
+    if (NULL != m_pNodeObj && NULL != m_pDeleteNodeObj)
+    {
+        m_pDeleteNodeObj(m_pNodeObj);
+    }
+
+    if (NULL != m_pDll)
+    {
+        dlclose(m_pDll);
+    }
+}
+
+CNodeAbstractBase* DynamicNodeObj::get_nodeObj ()
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter DynamicNodeObj::get_nodeObj ok.");
+
+    return m_pNodeObj;
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave DynamicNodeObj::get_nodeObj ok.");
+    return 0;
+}
+
+int DynamicNodeObj::init_nodeObj (
+    SOBSession* pSession,
+    const int64& llTaskId,
+    const int32& nInstId,
+    CBSErrorMsg& cErrorMsg )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter DynamicNodeObj::init_nodeObj ok.");
+
+    std::auto_ptr< CDmcextTemplateMgr<CFmTaskNodeInfoList> > tFmTaskNodeInfo = CDmcextAuditMgr::getFmTaskNodeInfo(pSession);
+CFmTaskNodeInfo cFmTaskNodeInfo;
+CFmTaskNodeInfoList listcFmTaskNodeInfo;
+
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave DynamicNodeObj::init_nodeObj ok.");
+    return 0;
+}

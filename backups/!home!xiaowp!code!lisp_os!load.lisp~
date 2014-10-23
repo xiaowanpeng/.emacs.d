@@ -1,0 +1,6 @@
+(load "packages.lisp")
+(load "computer/cpu.lisp")
+(load "computer/bios.lisp")
+(load "computer/disk.lisp")
+(load "os/boot.lisp")
+(load "os/protect.lisp")

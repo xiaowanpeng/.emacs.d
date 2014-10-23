@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ai_add
+# key: add
+# --
+// add by xiaowp at`(format-time-string " %Y/%m/%d " (current-time))`$0

@@ -1,0 +1,91 @@
+/**
+ * @file dmcext_audit_mgr.cpp
+ * @brief  mgr layer
+ * @author huangkun, huangkun@asiainfo-linkage.com
+ * @copyright(c) 2003-2012, Asiainfo HangZhou. All rights reserved.
+ * @version 1.0
+ * @date 2011-08-23
+ */
+
+#include "dmcext_audit_mgr.h"
+#include "ob_session.h"
+#include "base_db_func.h"
+
+
+std::auto_ptr< CDmcextTemplateMgr<CFmFlowDefineList> > CDmcextAuditMgr::getFmFlowDefine(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<CFmFlowDefineList> > m_pFmFlowDefine ( 
+        new CDmcextTemplateMgr<CFmFlowDefineList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmFlowDefine;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<CFmFlowNodeInfoList> > CDmcextAuditMgr::getFmFlowNodeInfo(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<CFmFlowNodeInfoList> > m_pFmFlowNodeInfo ( 
+        new CDmcextTemplateMgr<CFmFlowNodeInfoList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmFlowNodeInfo;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<CFmFlowNodeParamList> > CDmcextAuditMgr::getFmFlowNodeParam(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<CFmFlowNodeParamList> > m_pFmFlowNodeParam ( 
+        new CDmcextTemplateMgr<CFmFlowNodeParamList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmFlowNodeParam;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<CFmFlowNodeRelationList> > CDmcextAuditMgr::getFmFlowNodeRelation(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<CFmFlowNodeRelationList> > m_pFmFlowNodeRelation ( 
+        new CDmcextTemplateMgr<CFmFlowNodeRelationList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmFlowNodeRelation;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<CFmNodeDefineList> > CDmcextAuditMgr::getFmNodeDefine(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<CFmNodeDefineList> > m_pFmNodeDefine ( 
+        new CDmcextTemplateMgr<CFmNodeDefineList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmNodeDefine;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<CFmNodeParamDefineList> > CDmcextAuditMgr::getFmNodeParamDefine(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<CFmNodeParamDefineList> > m_pFmNodeParamDefine ( 
+        new CDmcextTemplateMgr<CFmNodeParamDefineList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmNodeParamDefine;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<CFmNodeScriptDefineList> > CDmcextAuditMgr::getFmNodeScriptDefine(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<CFmNodeScriptDefineList> > m_pFmNodeScriptDefine ( 
+        new CDmcextTemplateMgr<CFmNodeScriptDefineList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmNodeScriptDefine;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<CFmPlanList> > CDmcextAuditMgr::getFmPlan(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<CFmPlanList> > m_pFmPlan ( 
+        new CDmcextTemplateMgr<CFmPlanList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmPlan;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<CFmPlanParamList> > CDmcextAuditMgr::getFmPlanParam(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<CFmPlanParamList> > m_pFmPlanParam ( 
+        new CDmcextTemplateMgr<CFmPlanParamList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmPlanParam;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<CFmTaskLogList> > CDmcextAuditMgr::getFmTaskLog(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<CFmTaskLogList> > m_pFmTaskLog ( 
+        new CDmcextTemplateMgr<CFmTaskLogList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmTaskLog;
+}
+
+std::auto_ptr< CDmcextTemplateMgr<CFmTaskNodeInfoList> > CDmcextAuditMgr::getFmTaskNodeInfo(SOBSession* pSession)
+{
+    std::auto_ptr< CDmcextTemplateMgr<CFmTaskNodeInfoList> > m_pFmTaskNodeInfo ( 
+        new CDmcextTemplateMgr<CFmTaskNodeInfoList>(pSession, DB_JH, SCHEME_NAME_AIJH));
+    return m_pFmTaskNodeInfo;
+}
+

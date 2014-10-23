@@ -1,0 +1,29 @@
+(defun my-split (str ch)
+  (let ((beg 0)
+        (end 0)
+        (result nil)
+        (str (string-downcase str)))
+    (dotimes (i 10)
+      (setf end (position ch str :start beg))
+      (cond (end (setf result (append result (list (subseq str beg end))))
+                 (setf beg (1+ end)))
+            (t (setf result (append result (list (subseq str beg))))
+               (return result))))))
+
+(defparameter rednums (make-list 34 :initial-element (list 0 0)))
+(defparameter bluenums (make-list 17 :initial-element (list 0 0)))
+
+(defun inc-num (num-list idx)
+  (setf (nth idx num-list)
+        (list idx
+              (1+ (cadr (nth idx num-list))))))
+
+(defun main (file-name)
+  (with-open-file (his-log file-name)
+    (labels ((self (str-line)
+               (cond ((not (equal str-line 'eof))
+                      (format t str-line)
+                      (self (read-line his-log nil 'eof))))))
+      (self (read-line his-log nil 'eof)))))
+
+        

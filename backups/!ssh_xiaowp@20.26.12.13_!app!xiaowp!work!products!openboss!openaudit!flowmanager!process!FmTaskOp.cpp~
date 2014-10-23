@@ -1,0 +1,112 @@
+#include "base_func.h"
+
+#include "thread_value.h"
+#include "openbroker/OBClient.h"
+#include "openbroker/svr_ctrl.h"
+#include "ob_session.h"
+#include "ob_kernel.h"
+#include "c_uni_socket.h"
+#include "tool.h"
+#include "socket_pool.h"
+
+#include "FmTaskOp.h"
+
+int FmTaskOp::get_fmTask
+(
+    SOBSession* pSession,
+    AISTD string& strCond,
+    CFmTaskList& listFmTask,
+    CBSErrorMsg& cErrorMsg
+)
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter get_fmTask ok.");
+    ob_whereCond cFullSql;
+    ob_kernel<CFmPlanList> cKernel(*(pSession->get_dbConn()),SCHEME_NAME_AIJH);
+	
+    cFullSql << OCS(" select task_id, task_name, subtask_id, ext_task_id, plan_id, flow_id, task_date, begin_date, end_date, sts, run_msg, region_code, busi_id, xml ")
+             << OCS(" from fm_task")
+             << OCS(" where 1 = 1 ");
+    if (strCond != "")
+    {
+        strCond = AISTD string(" and ") + strCond;
+        cFullSql << OCS(strCond.c_str());
+    }
+ 	
+    ob_dataRows lstRow;
+    cKernel.direct_select(lstRow, cFullSql);
+	
+    int32 nLen = lstRow.size();
+
+    for (int i = 0; i < nLen; i++)
+    {
+        CFmTask cFmTask;
+        cFmTask.set_taskId(lstRow[i][0].get_asInt64());
+        cFmTask.set_taskName(lstRow[i][1].get_asString());
+        cFmTask.set_subtaskId(lstRow[i][2].get_asInt64());
+        cFmTask.set_extTaskId(lstRow[i][3].get_asInt64());
+        cFmTask.set_planId(lstRow[i][4].get_asInt64());
+        cFmTask.set_flowId(lstRow[i][5].get_asInt32());
+        cFmTask.set_taskDate(lstRow[i][6].get_asDatetime());
+        cFmTask.set_beginDate(lstRow[i][7].get_asDatetime());
+        cFmTask.set_endDate(lstRow[i][8].get_asDatetime());
+        cFmTask.set_sts(lstRow[i][9].get_asInt16());
+        cFmTask.set_runMsg(lstRow[i][10].get_asString());
+        cFmTask.set_regionCode(lstRow[i][11].get_asString());
+        cFmTask.set_busiId(lstRow[i][12].get_asInt32());
+        cFmTask.set_xml(lstRow[i][13].get_asString());
+
+        listFmTask.push_back(cFmTask);
+    }
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave get_fmTask ok.");
+    return 0;
+}
+
+int FmTaskOp::insert_fmTask (
+    SOBSession* pSession,
+    const CFmTask& cFmTask,
+    CBSErrorMsg& cErrorMsg )
+{
+    LogAppend(DEBUG_LEVEL,"InfoLevel","enter insert_fmTask ok.");
+
+    ob_whereCond cFullSQL;
+    ob_blob sBlob;
+    sBlob.m_strBlob.append(cFmTask.get_xml().c_str(), cFmTask.get_xml().length());    
+
+    cFullSQL << OCS("insert into ")
+             << OCS("fm_task (task_id, task_name, subtask_id, ext_task_id, plan_id, flow_id, task_date, begin_date, end_date, sts, run_msg, region_code, busi_id, xml) values(")
+             << cFmTask.get_taskId()
+             << OCS(" , ")
+             << cFmTask.get_taskName()
+             << OCS(" , ")
+             << cFmTask.get_subtaskId()
+             << OCS(" , ")
+             << cFmTask.get_extTaskId()
+             << OCS(" , ")
+             << cFmTask.get_planId()
+             << OCS(" , ")
+             << cFmTask.get_flowId()
+             << OCS(" , ")
+             << cFmTask.get_taskDate()
+             << OCS(" , ")
+             << cFmTask.get_beginDate()
+             << OCS(" , ")
+             << cFmTask.get_endDate()
+             << OCS(" , ")
+             << cFmTask.get_sts()
+             << OCS(" , ")
+             << cFmTask.get_runMsg()
+             << OCS(" , ")
+             << cFmTask.get_regionCode()
+             << OCS(" , ")
+             << cFmTask.get_busiId()
+             << OCS(" , empty_blob()) returning xml into ")
+             << sBlob;
+
+    ob_kernel<CFmPlanList> cKernel(*(pSession->get_dbConn()),SCHEME_NAME_AIJH);
+
+    cKernel.direct_execExt(cFullSQL, true);
+    
+    LogAppend(DEBUG_LEVEL,"InfoLevel","leave insert_fmTask ok.");
+    return 0;
+}

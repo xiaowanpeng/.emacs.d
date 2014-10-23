@@ -1,0 +1,22 @@
+#ifndef _INC_FLOW_ALARM_H_
+#define _INC_FLOW_ALARM_H_
+
+#include "dmcext_audit_mgr.h"
+
+class SOBSession;
+
+class CFlowAlarm
+{
+public:
+    CFlowAlarm();
+    ~CFlowAlarm();
+
+private:
+    int is_alarm
+      (SOBSession* pSession,
+       CBSErrorMsg& cErrorMsg);
+                 
+    
+};
+
+#endif
