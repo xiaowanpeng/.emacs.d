@@ -1,4 +1,0 @@
-(in-package disk)
-
-(defun get-first-sector ()
-  (format t "in get-first-sector.~%"))

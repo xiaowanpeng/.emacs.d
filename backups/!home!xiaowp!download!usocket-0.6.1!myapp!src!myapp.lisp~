@@ -1,6 +1,0 @@
-(in-package :cl-user)
-(defpackage myapp
-  (:use :cl))
-(in-package :myapp)
-
-;; blah blah blah.

@@ -1,5 +1,0 @@
-(require 'color-theme)
-
-(color-theme-charcoal-black)
-(linum-mode)
-(global-set-key (kbd "M-x") 'smex)

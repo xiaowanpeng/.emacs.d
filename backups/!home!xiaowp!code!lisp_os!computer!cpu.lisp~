@@ -1,4 +1,0 @@
-(in-package cpu)
-
-(defun run ()
-  (bios:run))

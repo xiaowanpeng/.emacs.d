@@ -1,4 +1,0 @@
-(in-package registers)
-
-(defclass cr0 ()
-  ((pe :initarg :pe)))

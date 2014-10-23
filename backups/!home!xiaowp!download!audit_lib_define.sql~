@@ -1,3 +1,0 @@
-insert into audit_lib_define (LIB_NAME, FUNC_NAME, REMARK, INTF_SVR_FLAG, REPAIR_FLAG, REALAUDIT_FLAG, FLOW_TASK_FLAG, STATUS_POLLING_FLAG, STATE_MACHINE_FLAG)
-values ('libStatusReplaceMgnt_mgrD.so', 'update_status', '', null, null, null, 1, null, 1);
-

@@ -1,8 +1,0 @@
-#ifndef _INC_FLOW_TASK_MONITOR_H_
-#define _INC_FLOW_TASK_MONITOR_H_
-
-class FlowTaskMonitor
-{
-}
-
-#endif

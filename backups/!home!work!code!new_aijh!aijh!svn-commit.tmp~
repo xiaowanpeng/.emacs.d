@@ -1,7 +1,0 @@
-
---此行及以下内容将会被忽略--
-
-D    mgrtemplate/dmcext_common.h
-D    mgrtemplate/dmcext_template_mgr_base.h
-D    mgrtemplate/dmcext_audit_mgr.h
-D    mgrtemplate/dmcext_template_mgr.h

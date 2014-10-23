@@ -1,3 +1,0 @@
-5.2.2--BOSS_USER_STATUS为空或长度不等于20位
-判断条件 user_status != 800 有用吗？user_status在数据库中的类型是number(1)
-

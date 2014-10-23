@@ -1,3 +1,0 @@
-(in-package lisp-os-test)
-
-(deftest test-test (protect::test) nil)

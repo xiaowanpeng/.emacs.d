@@ -1,3 +1,0 @@
-#(:source-registry
-#  (:tree "~/code/")
-#  :inherit-configuration)

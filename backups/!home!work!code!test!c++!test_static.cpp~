@@ -1,9 +1,0 @@
-#include <iostream>
-
-using namespace std;
-
-class Bass
-{
-public:
-    virtual v_func(int i) = 0;
-};
