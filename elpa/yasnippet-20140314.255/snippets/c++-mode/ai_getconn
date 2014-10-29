@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: ai_getconn
+# key: getconn
+# --
+otl_connect* pConnect = CDMCTool::get_db_conn
+    (pSession, $1, cErrorMsg);
+if (!pConnect)
+{
+    AISTD string strErr = "无法获取db_name为: ";
+    strErr += $1;
+    strErr += "的数据库连接。";
+    LogAppend(DEBUG_LEVEL,"InfoLevel",strErr.c_str());
+    cErrorMsg.set_errorMsg(strErr);
+    return -1;
+}

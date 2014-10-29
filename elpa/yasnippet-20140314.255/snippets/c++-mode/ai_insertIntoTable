@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: ai_insertIntoTable
+# key: ins
+# --
+if(t$1->insertIntoTable(
+        list$1,
+        cErrorMsg))
+{
+    LogAppend(DEBUG_LEVEL, "InfoLevel", "t$1->insertInfoTable");
+    return -1;
+}

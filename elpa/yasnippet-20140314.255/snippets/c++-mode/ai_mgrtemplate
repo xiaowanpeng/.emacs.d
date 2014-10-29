@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: ai_mgrtemplate
+# key: mt
+# --
+std::auto_ptr< CDmcextTemplateMgr<C$1List> > t$1 = CDmcextAuditMgr::get$1(pSession);
+C$1 ${2:c$1};
+C$1List list$2;

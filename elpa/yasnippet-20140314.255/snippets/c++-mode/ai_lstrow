@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ai_lstrow
+# key: lstr
+# --
+cFmTask.set_$1(lstRow[0][$2].get_as$3());

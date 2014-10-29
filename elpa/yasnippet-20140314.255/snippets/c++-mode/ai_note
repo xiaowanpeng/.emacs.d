@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: ai_note
+# key: note
+# --
+/* @brief $0
+ * @param pSession 
+ * @param cErrorMsg
+ * @return 0: success; -1: error
+ * @see
+ * @note
+ */
