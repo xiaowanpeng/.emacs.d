@@ -3,6 +3,7 @@
 ;auto-complete
 ;smex
 ;yasnippet
+;w3m
 
 (provide 'local_init)
 
@@ -198,3 +199,62 @@
 
 (clear-point-stack)
 ;;; point-stack ends here
+
+;;; ac-slime
+;(require 'ac-slime)
+;(add-hook 'slime-mode-hook 'set-up-slime-ac)
+;(add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
+;(eval-after-load "auto-complete"
+;  '(add-to-list 'ac-modes 'slime-repl-mode))
+
+;;; paredit
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+
+(require 'eldoc) ; if not already loaded
+(eldoc-add-command
+ 'paredit-backward-delete
+ 'paredit-close-round)
+
+(add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
+;; Stop SLIME's REPL from grabbing DEL,
+;; which is annoying when backspacing over a '('
+(defun override-slime-repl-bindings-with-paredit ()
+  (define-key slime-repl-mode-map
+    (read-kbd-macro paredit-backward-delete-key) nil))
+(add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)
+
+(defvar electrify-return-match
+  "[\]}\)\"]"
+  "If this regexp matches the text after the cursor, do an \"electric\"
+  return.")
+
+(defun electrify-return-if-match (arg)
+  "If the text after the cursor matches `electrify-return-match' then
+  open and indent an empty line between the cursor and the text.  Move the
+  cursor to the new line."
+  (interactive "P")
+  (let ((case-fold-search nil))
+    (if (looking-at electrify-return-match)
+        (save-excursion (newline-and-indent)))
+    (newline arg)
+    (indent-according-to-mode)))
+
+;; Using local-set-key in a mode-hook is a better idea.
+(global-set-key (kbd "RET") 'electrify-return-if-match)
+
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            (paredit-mode t)
+            (turn-on-eldoc-mode)
+            (eldoc-add-command
+             'paredit-backward-delete
+             'paredit-close-round)
+            (local-set-key (kbd "RET") 'electrify-return-if-match)
+            (eldoc-add-command 'electrify-return-if-match)
+            (show-paren-mode t)))
